@@ -47,3 +47,14 @@ add_dependencies(data_integation_node core_msgs_generate_messages_cpp)
 target_link_libraries(data_integation_node
   ${catkin_LIBRARIES} ${OpenCV_LIBS} ${cv_bridge_LIBRARIES}
 )
+
+add_executable(test_simple_wheel_controller_node
+  src/test_simple_wheel_controller_node.cpp
+  src/simple_wheel_controller.cpp
+)
+add_dependencies(test_simple_wheel_controller_node
+  ${catkin_EXPORTED_TARGETS}
+)
+target_link_libraries(test_simple_wheel_controller_node
+  ${catkin_LIBRARIES}
+)
