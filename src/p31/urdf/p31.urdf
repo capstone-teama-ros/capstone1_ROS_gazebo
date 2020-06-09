@@ -21,7 +21,7 @@
   
   <link name="base_link">
     <inertial>
-      <origin xyz="0.00042 0.01341 ${0.15547-0.1}" rpy="0 0 0" />
+      <origin xyz="0.00042 ${0.01341-0.1} ${0.15547-0.1}" rpy="0 0 0" />
       <mass
         value="4.29523826658563" />
       <inertia
@@ -30,7 +30,7 @@
         izz="0.07720025672" />
     </inertial>
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 0" rpy="0 0 -1.5707" />
       <geometry>
         <mesh filename="package://p31/meshes/base_link.STL" />
       </geometry>
@@ -39,7 +39,7 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 0" rpy="0 0 -1.5707" />
       <geometry>
         <mesh filename="package://p31/meshes/base_link.STL" />
       </geometry>
@@ -407,7 +407,7 @@
 
   <link name="lidar">
 	<visual>
-		<origin xyz="0 0 0.01" rpy="0 0 0"/>
+		<origin xyz="0 0 ${0.01}" rpy="0 0 0"/>
 		<geometry>
 			<cylinder radius="0.01" length="0.02"/>
 		</geometry>
@@ -415,7 +415,7 @@
   </link>
   
   <joint name="lidar_joint" type="fixed">
-	<origin xyz="-0.00053 -0.00579 ${0.25173+0.03}" rpy="0 0 0"/>\
+	<origin xyz="-0.00053 -0.10606 ${0.25173+0.03}" rpy="0 0 0"/>\
 	<parent link="base_link"/>
 	<child link="lidar"/>
   </joint>
@@ -430,7 +430,7 @@
   </link>
   
   <joint name="imu_joint" type="fixed">
-	<origin xyz="-0.00053 -0.00579 0.25173" rpy="0 0 0"/>\
+	<origin xyz="-0.00053 ${0.01341-0.1} 0.25173" rpy="0 0 0"/>\
 	<parent link="base_link"/>
 	<child link="imu_link"/>
   </joint>
@@ -479,7 +479,7 @@
   <link name="camera_depth_optical_frame"/>
   <!--2-->
   <joint name="camera_joint2" type="fixed">
-    <origin xyz="0.0 -0.08228 ${0.19695}" rpy="0 1.5707 -1.5707"/>
+    <origin xyz="0.0 -0.12978 ${0.19695}" rpy="0 1.5707 -1.5707"/>
     <parent link="base_link"/>
     <child link="camera_link2"/>
   </joint>
