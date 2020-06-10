@@ -6,7 +6,7 @@ void search_blue_ball1(){
 	double existing_theta;
   std::vector<double> found_blue;
   
-	while(turned_angle != M_PI/2 && found_blue.size() < 3){
+	while(turned_angle <= M_PI/2 && found_blue.size() < 3){
 	  for(i = 0; i<blue_x.size(); i++){
 		  if(i == 0) {
 			  min_blue_distance = pow(blue_x[i], 2) + pow(blue_y[i], 2);
