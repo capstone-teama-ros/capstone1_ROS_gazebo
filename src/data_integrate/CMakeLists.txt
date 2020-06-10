@@ -58,3 +58,16 @@ add_dependencies(test_simple_wheel_controller_node
 target_link_libraries(test_simple_wheel_controller_node
   ${catkin_LIBRARIES}
 )
+
+add_executable(test_stationary_align_driver_node
+  src/test_stationary_align_driver_node.cpp
+  src/stationary_align_driver.cpp
+  src/simple_wheel_controller.cpp
+)
+add_dependencies(test_stationary_align_driver_node
+  ${catkin_EXPORTED_TARGETS}
+)
+target_link_libraries(test_stationary_align_driver_node
+  ${catkin_LIBRARIES}
+)
+
