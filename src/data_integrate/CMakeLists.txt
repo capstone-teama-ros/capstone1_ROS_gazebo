@@ -71,3 +71,14 @@ target_link_libraries(test_stationary_align_driver_node
   ${catkin_LIBRARIES}
 )
 
+add_executable(test_fixed_distance_driver_node
+  src/test_fixed_distance_driver_node.cpp
+  src/fixed_distance_driver.cpp
+  src/simple_wheel_controller.cpp
+)
+add_dependencies(test_fixed_distance_driver_node
+  ${catkin_EXPORTED_TARGETS}
+)
+target_link_libraries(test_fixed_distance_driver_node
+  ${catkin_LIBRARIES}
+)
