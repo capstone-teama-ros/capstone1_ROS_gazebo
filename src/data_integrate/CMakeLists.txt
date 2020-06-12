@@ -17,7 +17,9 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(OpenCV REQUIRED )
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES ${PROJECT_NAME}_features_lib
+  LIBRARIES
+  ${PROJECT_NAME}_features_lib
+  ${PROJECT_NAME}_tasks_lib
 #  CATKIN_DEPENDS roscpp
 #  sensor_msgs
 #  std_msgs
@@ -46,8 +48,18 @@ add_library(${PROJECT_NAME}_features_lib
   src/features/rel_point.cpp
   src/features/visible_feature_manager.cpp
 )
-
 add_dependencies(${PROJECT_NAME}_features_lib
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
+
+add_library(${PROJECT_NAME}_tasks_lib
+  src/tasks/blue_ball_capture_task.cpp
+  src/tasks/blue_ball_return_task.cpp
+  src/tasks/blue_ball_search_task.cpp
+  src/tasks/goal_post_search_task.cpp
+)
+add_dependencies(${PROJECT_NAME}_tasks_lib
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )

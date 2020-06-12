@@ -2,7 +2,8 @@
 
 #include <ros/ros.h>
 
-Task::TaskPtr BlueBallCaptureTask::updateTaskOrMakeNextTask(double time_passed_after_last)
+Task::TaskPtr BlueBallCaptureTask::updateTaskOrMakeNextTask(double time_passed_after_last,
+                                                            const VisibleFeatureManager &visible_features)
 {
   // TODO 실제 코드를 추가해야 합니다
   ROS_ASSERT_MSG(0, "Not implemented");
