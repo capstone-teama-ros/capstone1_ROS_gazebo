@@ -3,7 +3,7 @@
  */
 
 #include <ros/ros.h>
-#include "features/visible_feature_manager.h"
+#include "data_integrate/features/visible_feature_manager.h"
 
 /**
  * 테스트할 용도로 상속함

@@ -1,5 +1,5 @@
 #include <std_msgs/Float64.h>
-#include "../include/simple_wheel_controller.h"
+#include "data_integrate/simple_wheel_controller.h"
 
 SimpleWheelController::SimpleWheelController(const ros::Publisher &left_wheel, const ros::Publisher &right_wheel)
   : left_wheel_(left_wheel), right_wheel_(right_wheel)
