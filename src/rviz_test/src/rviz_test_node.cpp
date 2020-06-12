@@ -32,7 +32,8 @@ int main(int argc, char** argv)
   visualization_msgs::Marker marker;
 
   // Marker's frame (fixed frame)
-  marker.header.frame_id = "/my_frame";
+  marker.header.frame_id = "/base_scan";
+  marker.header.stamp = ros::Time(0);  // No timestamp; always display this
 
   // Unique identifier for the marker
   marker.ns = "my_shape";
@@ -52,9 +53,9 @@ int main(int argc, char** argv)
   marker.pose.orientation.z = 1.0;  // rotate about z-axis?
   marker.pose.orientation.w = 1.0;  // rotation amount?
 
-  marker.scale.x = 1.0;
-  marker.scale.y = 1.0;
-  marker.scale.z = 1.0;
+  marker.scale.x = 0.2;
+  marker.scale.y = 0.2;
+  marker.scale.z = 0.2;
 
   marker.color.r = 0.0;
   marker.color.g = 1.0;
@@ -65,8 +66,17 @@ int main(int argc, char** argv)
 
   while (ros::ok())
   {
-    marker.header.stamp = ros::Time::now();
-    marker.pose.orientation.w += 0.5;
+    auto& lidar_points = vfm.getLidarPoints();
+    if (lidar_points.size() > 0)
+    {
+      // 첫 점의 좌표를 사용
+      auto x = lidar_points.front().getRelX();
+      auto y = lidar_points.front().getRelY();
+      marker.pose.position.x = x;
+      marker.pose.position.y = y;
+      ROS_INFO("Point highlighted: %f, %f", x, y);
+    }
+
     marker_pub.publish(marker);
 
     ros::spinOnce();
