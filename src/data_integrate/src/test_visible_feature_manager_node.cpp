@@ -35,9 +35,8 @@ void TestVisibleFeatureManager::subscribeToCamera(const core_msgs::ball_position
   int blue_balls = 0;
   int red_balls = 0;
   int green_balls = 0;
-  for (auto& ball_pair : getBalls())
+  for (auto& ball : getBalls())
   {
-    auto& ball = ball_pair.second;
     auto color = ball.getColor();
     switch (color)
     {

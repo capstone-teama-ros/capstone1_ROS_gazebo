@@ -9,7 +9,7 @@ void TaskExecutor::runTaskInLoop(double time_passed_after_last, double time_unti
   ROS_ASSERT_MSG(task_, "Missing task");
 
   // 현재 작업을 업데이트하고, 필요하면 새로운 작업으로 전환합니다.
-  auto nextTask = task_->updateTaskOrMakeNextTask(time_passed_after_last, visible_features_);
+  auto nextTask = task_->updateTaskOrMakeNextTask(time_passed_after_last, visible_features_, past_features_);
   if (nextTask)
   {
     task_ = std::move(nextTask);

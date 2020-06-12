@@ -55,29 +55,13 @@ void VisibleFeatureManager::subscribeToCamera(const core_msgs::ball_position::Co
   is_blue_ball_captured_ = msg->still_blue;
 }
 
-VisibleFeatureManager::FeatureId VisibleFeatureManager::addBall(const Ball& ball)
+void VisibleFeatureManager::addBall(const Ball& ball)
 {
-  FeatureId feature_id;
-  do
-  {
-    feature_id = generateId();
-  } while (isFeatureIdInUse(feature_id));
-
-  balls_.emplace(feature_id, ball);
+  balls_.emplace_back(ball);
 }
 
 void VisibleFeatureManager::clearAllFeatures()
 {
   balls_.clear();
   lidar_points_.clear();
-}
-
-bool VisibleFeatureManager::isFeatureIdInUse(VisibleFeatureManager::FeatureId id) const
-{
-  if (balls_.find(id) != balls_.end())
-  {
-    return true;
-  }
-
-  return false;
 }

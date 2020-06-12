@@ -2,6 +2,7 @@
 #define DATA_INTEGRATE_TASK_EXECUTOR_H
 
 #include <memory>
+#include "./features/past_feature_manager.h"
 #include "./features/visible_feature_manager.h"
 #include "./simple_wheel_controller.h"
 #include "./tasks/task.h"
@@ -12,10 +13,15 @@
 class TaskExecutor
 {
 public:
+  // TODO 값을 조절할 수 있게 만들어야 함
+  /// 과거의 지형지물의 신뢰성이 감소하는 속도
+  static constexpr double PAST_FEATURE_DECAY_RATE = 0.8;
+
   /**
    * @param visible_features 가장 최근에 관측된 지형지물 정보
    */
-  TaskExecutor(const VisibleFeatureManager &visible_features) : visible_features_(visible_features)
+  TaskExecutor(const VisibleFeatureManager &visible_features)
+    : visible_features_(visible_features), past_features_(PAST_FEATURE_DECAY_RATE)
   {
   }
 
@@ -41,6 +47,7 @@ private:
   /// 현재 실행 중인 작업
   std::unique_ptr<Task> task_;
   const VisibleFeatureManager &visible_features_;
+  PastFeatureManager past_features_;
 };
 
 #endif  // DATA_INTEGRATE_TASK_EXECUTOR_H

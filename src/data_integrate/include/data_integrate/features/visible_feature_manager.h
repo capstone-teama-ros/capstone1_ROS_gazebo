@@ -3,13 +3,14 @@
 
 #include <core_msgs/ball_position.h>
 #include <sensor_msgs/LaserScan.h>
-#include <unordered_map>
 #include <vector>
 #include "./ball.h"
-#include "./feature_manager.h"
 #include "./rel_point.h"
 
-class VisibleFeatureManager : public FeatureManager
+/**
+ * 가장 최근에 관측한 정보를 담는 클래스입니다.
+ */
+class VisibleFeatureManager
 {
 public:
   /**
@@ -26,7 +27,7 @@ public:
    */
   void subscribeToLidar(const sensor_msgs::LaserScan::ConstPtr& msg);
 
-  using BallCollection = std::unordered_map<FeatureId, Ball>;
+  using BallCollection = std::vector<Ball>;
   using LidarPointCollection = std::vector<RelPoint>;
 
   /**
@@ -56,20 +57,14 @@ public:
   /**
    * 새로운 공을 추가합니다.
    *
-   * @param ball 기억할 공의 정보
-   * @returns 새로운 공에 할당한 ID값
+   * @param ball 관측한 공의 정보
    */
-  FeatureId addBall(const Ball& ball);
+  void addBall(const Ball& ball);
 
   /**
    * 기억 중인 모든 feature 정보를 지웁니다.
    */
   void clearAllFeatures();
-
-  /**
-   * 입력한 feature ID를 이 feature manager가 이미 사용 중인지 확인합니다.
-   */
-  bool isFeatureIdInUse(FeatureId id) const override;
 
 private:
   BallCollection balls_;
