@@ -2,14 +2,15 @@
 #define DATA_INTEGRATE_FEATURES_PAST_FEATURE_MANAGER_H
 
 #include <unordered_map>
-#include "./feature_manager.h"
+
 #include "./past_ball.h"
 
 /**
  * 과거에 보았던 중요한 지형지물의 정보를 관리하는 클래스입니다.
+ * 과거에 봤던 지형지물에 고유한 ID를 붙여서 관리합니다.
  * 각 지형지물의 신뢰성은 지나간 시간에 대한 지수함수의 형태로 감소합니다.
  */
-class PastFeatureManager : public FeatureManager
+class PastFeatureManager
 {
 public:
   /**
@@ -17,6 +18,8 @@ public:
    */
   PastFeatureManager(double decay_rate);
 
+  // 공과 같은 중요한 지형지물을 식별하기 위해 부여하는 고유한 값
+  using FeatureId = unsigned int;
   using BallCollection = std::unordered_map<FeatureId, PastBall>;
 
   /**
@@ -86,9 +89,15 @@ public:
   void rotateSelfZ(double angle);
 
   /**
+   * 새로운 지형지물을 만들기 위한 ID 값을 생성합니다.
+   * 기존의 지형지물이 사용하는 ID값과 겹칠 수 있으니 @c isFeatureIdInUse() 로 검사해야 합니다.
+   */
+  static FeatureId generateId();
+
+  /**
    * 입력한 feature ID를 이 feature manager가 이미 사용 중인지 확인합니다.
    */
-  bool isFeatureIdInUse(FeatureId id) const override;
+  bool isFeatureIdInUse(FeatureId id) const;
 
 private:
   double decay_rate_;
