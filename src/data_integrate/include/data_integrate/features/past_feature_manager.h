@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include "./past_ball.h"
+#include "./virtual_point.h"
 
 /**
  * 과거에 보았던 중요한 지형지물의 정보를 관리하는 클래스입니다.
@@ -21,6 +22,7 @@ public:
   // 공과 같은 중요한 지형지물을 식별하기 위해 부여하는 고유한 값
   using FeatureId = unsigned int;
   using BallCollection = std::unordered_map<FeatureId, PastBall>;
+  using VirtualPointCollection = std::unordered_map<FeatureId, VirtualPoint>;
 
   /**
    * 과거에 관측했던 공들의 목록을 가져옵니다.
@@ -42,6 +44,30 @@ public:
    * @returns 일치하는 공을 가리키는 포인터 또는 @c nullptr
    */
   const PastBall* getBall(FeatureId id) const;
+
+  /**
+   * 추적 중인 가상의 점의 목록을 가져옵니다.
+   */
+  const VirtualPointCollection& getVirtualPoints() const
+  {
+    return virtual_points_;
+  }
+
+  /**
+   * 새로운 가상의 점을 추가합니다.
+   *
+   * @param virtual_point 기억할 가상의 점의 정보
+   * @returns 가상의 점에 할당한 ID값
+   */
+  FeatureId addVirtualPoint(const VirtualPoint& virtual_point);
+
+  /**
+   * 과거에 본 가상의 점을 ID 값으로 찾습니다. ID가 일치하는 점이 없으면 @c nullptr 를 돌려줍니다.
+   *
+   * @param id 가상점의 ID
+   * @returns 일치하는 가상의 점을 가리키는 포인터 또는 @c nullptr
+   */
+  const VirtualPoint* getVirtualPoint(FeatureId id) const;
 
   /**
    * 기억 중인 모든 feature 정보를 지웁니다.
@@ -102,6 +128,7 @@ public:
 private:
   double decay_rate_;
   BallCollection balls_;
+  VirtualPointCollection virtual_points_;
 };
 
 #endif  // DATA_INTEGRATE_FEATURES_PAST_FEATURE_MANAGER_H

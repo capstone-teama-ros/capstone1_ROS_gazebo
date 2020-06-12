@@ -36,9 +36,31 @@ const PastBall* PastFeatureManager::getBall(FeatureId id) const
   return &ball->second;
 }
 
+PastFeatureManager::FeatureId PastFeatureManager::addVirtualPoint(const VirtualPoint& virtual_point)
+{
+  FeatureId feature_id;
+  do
+  {
+    feature_id = generateId();
+  } while (isFeatureIdInUse(feature_id));
+
+  virtual_points_.emplace(feature_id, virtual_point);
+}
+
+const VirtualPoint* PastFeatureManager::getVirtualPoint(FeatureId id) const
+{
+  auto virtual_point = virtual_points_.find(id);
+  if (virtual_point == virtual_points_.end())
+  {
+    return nullptr;
+  }
+  return &virtual_point->second;
+}
+
 void PastFeatureManager::clearAllFeatures()
 {
   balls_.clear();
+  virtual_points_.clear();
 }
 
 void PastFeatureManager::updateReliability(double time_passed)
@@ -51,6 +73,12 @@ void PastFeatureManager::updateReliability(double time_passed)
     auto reliability = ball_pair.second.getReliability() * decay_amount;
     ball_pair.second = PastBall(ball_pair.second, reliability);
   }
+
+  for (auto& virtual_point_pair : virtual_points_)
+  {
+    auto reliability = virtual_point_pair.second.getReliability() * decay_amount;
+    virtual_point_pair.second = VirtualPoint(virtual_point_pair.second, reliability);
+  }
 }
 
 void PastFeatureManager::translateObjectsXY(double x, double y)
@@ -60,6 +88,13 @@ void PastFeatureManager::translateObjectsXY(double x, double y)
     auto& ball = ball_pair.second;
     ball_pair.second =
         PastBall::fromRelXY(ball.getColor(), ball.getRelX() + x, ball.getRelY() + y, ball.getReliability());
+  }
+
+  for (auto& virtual_point_pair : virtual_points_)
+  {
+    auto& virtual_point = virtual_point_pair.second;
+    virtual_point_pair.second = VirtualPoint::fromRelXY(virtual_point.getRelX() + x, virtual_point.getRelY() + y,
+                                                        virtual_point.getReliability());
   }
 }
 
@@ -74,6 +109,13 @@ void PastFeatureManager::rotateObjectsZ(double angle)
   {
     auto& ball = ball_pair.second;
     ball_pair.second = PastBall(ball.getColor(), ball.getDistance(), ball.getAngle() + angle, ball.getReliability());
+  }
+
+  for (auto& virtual_point_pair : virtual_points_)
+  {
+    auto& virtual_point = virtual_point_pair.second;
+    virtual_point_pair.second =
+        VirtualPoint(virtual_point.getDistance(), virtual_point.getAngle() + angle, virtual_point.getReliability());
   }
 }
 
@@ -107,6 +149,10 @@ PastFeatureManager::FeatureId PastFeatureManager::generateId()
 bool PastFeatureManager::isFeatureIdInUse(FeatureId id) const
 {
   if (balls_.find(id) != balls_.end())
+  {
+    return true;
+  }
+  if (virtual_points_.find(id) != virtual_points_.end())
   {
     return true;
   }
