@@ -1,33 +1,11 @@
-#include <arpa/inet.h>
-#include <math.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <algorithm>
-#include <boost/thread.hpp>
-#include <chrono>
-#include <fstream>
-#include <iostream>
-#include <string>
-
-#include <ros/package.h>
+#include <core_msgs/ball_position.h>
 #include <ros/ros.h>
-#include "core_msgs/ball_position.h"
+#include <sensor_msgs/LaserScan.h>
+#include <std_msgs/Float64.h>
 
 #include "data_integrate/features/visible_feature_manager.h"
 #include "data_integrate/simple_wheel_controller.h"
 #include "data_integrate/task_executor.h"
-#include "ros/ros.h"
-#include "sensor_msgs/LaserScan.h"
-#include "std_msgs/Float64.h"
-#include "std_msgs/Int8.h"
-#include "std_msgs/String.h"
-
-#include "opencv2/opencv.hpp"
 
 int main(int argc, char** argv)
 {
@@ -66,7 +44,7 @@ int main(int argc, char** argv)
     fl_publish.publish(FL_position_msg);
     fr_publish.publish(FR_position_msg);
     cs_publish.publish(CS_position_msg);
-    std::cout << "moving" << std::endl;
+    ROS_INFO("moving");
 
     // TODO 더 정확한 시간을 사용하기
     task_executor.runTaskInLoop(sleep_duration.toSec(), sleep_duration.toSec(), wheel_controller);
