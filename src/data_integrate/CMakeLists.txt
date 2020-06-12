@@ -99,3 +99,14 @@ add_dependencies(test_fixed_distance_driver_node
 target_link_libraries(test_fixed_distance_driver_node
   ${catkin_LIBRARIES}
 )
+
+add_executable(test_visible_feature_manager_node
+  src/test_visible_feature_manager_node.cpp
+)
+add_dependencies(test_visible_feature_manager_node
+  ${catkin_EXPORTED_TARGETS}
+)
+target_link_libraries(test_visible_feature_manager_node
+  ${catkin_LIBRARIES}
+  ${PROJECT_NAME}_features_lib
+)
