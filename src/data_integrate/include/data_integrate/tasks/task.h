@@ -2,6 +2,7 @@
 #define DATA_INTEGRATE_TASKS_TASK_H
 
 #include <memory>
+#include "../features/past_feature_manager.h"
 #include "../features/visible_feature_manager.h"
 #include "../simple_wheel_controller.h"
 
@@ -20,12 +21,13 @@ public:
    *
    * @param time_passed_after_last  직전의 상태 업데이트를 호출한 이후, 실제로 지난 시간 (seconds)
    * @param visible_features        가장 최근에 관측된 지형지물 정보
+   * @param past_features           기억하고 있는 지형지물 정보
    * @returns 현재 작업을 계속 진행해야 할 경우 @c nullptr 를 리턴하면 됩니다.
    * 현재 작업을 중지하고 새로운 작업으로 전환해야 할 경우, 새로운 작업의 클래스를 @c std::make_unique() 로 생성하여
    * 리턴하면 됩니다.
    */
-  virtual TaskPtr updateTaskOrMakeNextTask(double time_passed_after_last,
-                                           const VisibleFeatureManager &visible_features) = 0;
+  virtual TaskPtr updateTaskOrMakeNextTask(double time_passed_after_last, const VisibleFeatureManager &visible_features,
+                                           const PastFeatureManager &past_features) = 0;
 
   /**
    * 현재 상태에 알맞게 바퀴 컨트롤러의 상태를 업데이트합니다.
