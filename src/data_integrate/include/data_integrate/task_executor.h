@@ -2,6 +2,7 @@
 #define DATA_INTEGRATE_TASK_EXECUTOR_H
 
 #include <memory>
+#include "./features/visible_feature_manager.h"
 #include "./simple_wheel_controller.h"
 #include "./tasks/task.h"
 
@@ -11,6 +12,13 @@
 class TaskExecutor
 {
 public:
+  /**
+   * @param visible_features 가장 최근에 관측된 지형지물 정보
+   */
+  TaskExecutor(const VisibleFeatureManager &visible_features) : visible_features_(visible_features)
+  {
+  }
+
   /**
    * 현재 실행 중인 작업의 상태를 업데이트하고, 작업의 결정에 따라 바퀴 컨트롤러에 메시지를 전파합니다.
    * 매 루프마다 호출해야 합니다.
@@ -32,6 +40,7 @@ public:
 private:
   /// 현재 실행 중인 작업
   std::unique_ptr<Task> task_;
+  const VisibleFeatureManager &visible_features_;
 };
 
 #endif  // DATA_INTEGRATE_TASK_EXECUTOR_H
