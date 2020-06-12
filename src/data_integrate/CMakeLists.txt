@@ -45,6 +45,7 @@ include_directories(
 add_library(${PROJECT_NAME}_features_lib
   src/features/ball.cpp
   src/features/feature_manager.cpp
+  src/features/past_ball.cpp
   src/features/rel_point.cpp
   src/features/visible_feature_manager.cpp
 )
