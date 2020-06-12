@@ -36,6 +36,23 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   include
 )
+
+#### Build: Libraries ####
+
+add_library(${PROJECT_NAME}_features_lib
+  src/features/ball.cpp
+  src/features/feature_manager.cpp
+  src/features/rel_point.cpp
+  src/features/visible_feature_manager.cpp
+)
+
+add_dependencies(${PROJECT_NAME}_features_lib
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
+
+#### Build: Executables ####
+
 # add_executable(data_show_node src/data_show.cpp)
 # add_dependencies(data_show_node core_msgs_generate_messages_cpp)
 
