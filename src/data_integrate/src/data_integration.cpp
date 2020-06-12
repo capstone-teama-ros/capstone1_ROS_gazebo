@@ -177,7 +177,7 @@ private:
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "data_integation");
+  ros::init(argc, argv, "data_integration");
   ros::NodeHandle n;
 
   ros::Subscriber sub = n.subscribe<sensor_msgs::LaserScan>("/scan", 1000, lidar_Callback);
