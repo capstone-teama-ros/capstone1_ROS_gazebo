@@ -46,6 +46,14 @@ public:
   }
 
   /**
+   * 현재 파란 공이 포획되어 있는지 확인합니다.
+   */
+  bool isBlueBallCaptured() const
+  {
+    return is_blue_ball_captured_;
+  }
+
+  /**
    * 새로운 공을 추가합니다.
    *
    * @param ball 기억할 공의 정보
@@ -66,6 +74,7 @@ public:
 private:
   BallCollection balls_;
   LidarPointCollection lidar_points_;
+  bool is_blue_ball_captured_ = false;
 };
 
 #endif  // DATA_INTEGRATE_FEATURES_VISIBLE_FEATURE_MANAGER_H

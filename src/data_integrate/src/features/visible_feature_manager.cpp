@@ -51,6 +51,8 @@ void VisibleFeatureManager::subscribeToCamera(const core_msgs::ball_position::Co
   {
     addBall(Ball::fromRelXY(BallColor::Green, msg->green_x[i], msg->green_y[i]));
   }
+
+  is_blue_ball_captured_ = msg->still_blue;
 }
 
 VisibleFeatureManager::FeatureId VisibleFeatureManager::addBall(const Ball& ball)
