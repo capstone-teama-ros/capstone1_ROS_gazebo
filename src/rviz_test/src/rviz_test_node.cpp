@@ -29,8 +29,46 @@ int main(int argc, char** argv)
   ROS_INFO("\"%s\" started", ros::this_node::getName().c_str());
   ros::Rate spin_rate(10);  // Hz
 
+  visualization_msgs::Marker marker;
+
+  // Marker's frame (fixed frame)
+  marker.header.frame_id = "/my_frame";
+
+  // Unique identifier for the marker
+  marker.ns = "my_shape";
+  marker.id = 0;
+
+  // Marker shape
+  marker.type = visualization_msgs::Marker::CUBE;
+  // Marker action
+  marker.action = visualization_msgs::Marker::ADD;
+
+  // Set marker initial pose
+  marker.pose.position.x = 0;
+  marker.pose.position.y = 0;
+  marker.pose.position.z = 0;
+  marker.pose.orientation.x = 0.0;
+  marker.pose.orientation.y = 0.0;
+  marker.pose.orientation.z = 1.0;  // rotate about z-axis?
+  marker.pose.orientation.w = 1.0;  // rotation amount?
+
+  marker.scale.x = 1.0;
+  marker.scale.y = 1.0;
+  marker.scale.z = 1.0;
+
+  marker.color.r = 0.0;
+  marker.color.g = 1.0;
+  marker.color.b = 0.0;
+  marker.color.a = 1.0;
+
+  marker.lifetime = ros::Duration();  // Stay alive forever
+
   while (ros::ok())
   {
+    marker.header.stamp = ros::Time::now();
+    marker.pose.orientation.w += 0.5;
+    marker_pub.publish(marker);
+
     ros::spinOnce();
     spin_rate.sleep();
   }
