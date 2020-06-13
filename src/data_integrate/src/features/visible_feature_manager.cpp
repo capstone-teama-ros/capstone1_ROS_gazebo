@@ -27,11 +27,11 @@ void VisibleFeatureManager::subscribeToLidar(const sensor_msgs::LaserScan::Const
 
 void VisibleFeatureManager::subscribeToCamera(const core_msgs::ball_position::ConstPtr& msg)
 {
-  ROS_ASSERT_MSG(msg->blue_x.size() == msg->blue_y.size(), "Number of X and Y coordinates must be equal (%u != %u)",
+  ROS_ASSERT_MSG(msg->blue_x.size() == msg->blue_y.size(), "Number of X and Y coordinates must be equal (%lu != %lu)",
                  msg->blue_x.size(), msg->blue_y.size());
-  ROS_ASSERT_MSG(msg->red_x.size() == msg->red_y.size(), "Number of X and Y coordinates must be equal (%u != %u)",
+  ROS_ASSERT_MSG(msg->red_x.size() == msg->red_y.size(), "Number of X and Y coordinates must be equal (%lu != %lu)",
                  msg->red_x.size(), msg->red_y.size());
-  ROS_ASSERT_MSG(msg->green_x.size() == msg->green_y.size(), "Number of X and Y coordinates must be equal (%u != %u)",
+  ROS_ASSERT_MSG(msg->green_x.size() == msg->green_y.size(), "Number of X and Y coordinates must be equal (%lu != %lu)",
                  msg->green_x.size(), msg->blue_y.size());
 
   // 기존의 공을 모두 지웁니다
