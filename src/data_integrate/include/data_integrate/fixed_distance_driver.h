@@ -1,7 +1,7 @@
 #ifndef DATA_INTEGRATE_FIXED_DISTANCE_DRIVER_H
 #define DATA_INTEGRATE_FIXED_DISTANCE_DRIVER_H
 
-#include "../include/simple_wheel_controller.h"
+#include "./simple_wheel_controller.h"
 
 /**
  * 입력한 거리만큼 직선으로 전진 또는 후진한 뒤 정지하는 운전자입니다.

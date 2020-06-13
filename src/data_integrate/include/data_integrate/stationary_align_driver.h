@@ -1,7 +1,7 @@
 #ifndef DATA_INTEGRATE_STATIONARY_ALIGN_DRIVER_H
 #define DATA_INTEGRATE_STATIONARY_ALIGN_DRIVER_H
 
-#include "../include/simple_wheel_controller.h"
+#include "./simple_wheel_controller.h"
 
 /**
  * 자신에 대한 상대 위치 (x, y)에 있는 점이 정면 방향에 오도록 제자리에서 회전하는 운전자입니다.

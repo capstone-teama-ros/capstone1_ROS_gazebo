@@ -7,8 +7,8 @@
 #include <std_msgs/Float64.h>
 #include <random>
 
-#include "../include/simple_wheel_controller.h"
-#include "../include/stationary_align_driver.h"
+#include "data_integrate/simple_wheel_controller.h"
+#include "data_integrate/stationary_align_driver.h"
 
 int main(int argc, char** argv)
 {

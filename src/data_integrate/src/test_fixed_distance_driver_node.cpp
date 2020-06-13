@@ -7,8 +7,8 @@
 #include <std_msgs/Float64.h>
 #include <random>
 
-#include "../include/fixed_distance_driver.h"
-#include "../include/simple_wheel_controller.h"
+#include "data_integrate/fixed_distance_driver.h"
+#include "data_integrate/simple_wheel_controller.h"
 
 int main(int argc, char** argv)
 {
