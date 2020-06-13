@@ -60,6 +60,7 @@ add_library(${PROJECT_NAME}_tasks_lib
   src/tasks/blue_ball_search_task.cpp
   src/tasks/goal_post_search_task.cpp
   src/tasks/task.cpp
+  src/tasks/turn_angle.cpp
 )
 add_dependencies(${PROJECT_NAME}_tasks_lib
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
