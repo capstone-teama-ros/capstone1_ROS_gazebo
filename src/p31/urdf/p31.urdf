@@ -21,13 +21,13 @@
   
   <link name="base_link">
     <inertial>
-      <origin xyz="0.00042 ${0.01341-0.1} ${0.15547-0.1}" rpy="0 0 0" />
+      <origin xyz="0.00032 -0.02744 ${0.14584-0.1}" rpy="0 0 0" />
       <mass
         value="4.29523826658563" />
       <inertia
-        ixx="0.05257290302" ixy=" -0.00009132603" ixz=" 0.00002450059"
-        iyy="0.04693815901" iyz="-0.00105307171"
-        izz="0.07720025672" />
+        ixx="0.07434742639" ixy=" -0.00007310414" ixz=" 0.00002189021"
+        iyy=" 0.07754895370" iyz="0.00219946424"
+        izz="0.11680173677" />
     </inertial>
     <visual>
       <origin xyz="0 0 0" rpy="0 0 -1.5707" />
@@ -77,7 +77,7 @@
     <parent link="base_link" />
     <child link="suspension1" />
     <axis xyz="0 0 1" />
-    <limit  lower="0" upper="0.1" effort="0" velocity="0" />
+    <limit  lower="-0.05" upper="0.05" effort="10000" velocity="100000" />
   </joint>
   
   <link name="wheel1">
@@ -179,10 +179,10 @@
     <axis
       xyz="0 0 1" />
     <limit
-      lower="0"
-      upper="0.1"
-      effort="0"
-      velocity="0" />
+      lower="-0.05"
+      upper="0.05"
+      effort="10000"
+      velocity="100000" />
   </joint>
   <link
     name="wheel2">
@@ -293,10 +293,10 @@
     <axis
       xyz="0 -1 0" />
     <limit
-      lower="0"
-      upper="0.1"
-      effort="0"
-      velocity="0" />
+      lower="-0.05"
+      upper="0.05"
+      effort="10000"
+      velocity="100000" />
   </joint>
   <link
     name="wheel3">

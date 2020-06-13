@@ -103,7 +103,7 @@ public:
 
     // turtlebot의 바퀴 반지름은 0.033m이다.
     // TODO: 나중에 우리 로봇의 바퀴 크기에 맞춰 비례상수를 다시 계산해야 한다.
-    const double LINEAR_SPEED_FACTOR = 50;
+    const double LINEAR_SPEED_FACTOR = 1;
     // TODO: 로봇의 각속도를 바퀴의 회전속도로 변환하는 비례상수는 지금은 알 수 없다.
     // 일단 1로 놓고 나중에 제대로 구해보자.
     const double ANGULAR_SPEED_FACTOR = 1.0;
@@ -139,7 +139,7 @@ private:
   const ros::Publisher& fr_wheel_;
 
 
-  double linear_speed_ = 10.0;
+  double linear_speed_ = 0;
   double angular_speed_ = 0;
 
   /**
@@ -177,16 +177,16 @@ int main(int argc, char **argv)
 
     WheelController wheelController(fl_wheel, fr_wheel);
 
-    while(ros::ok){
+    while(ros::ok()){
 		std_msgs::Float64 FL_position_msg;
 		std_msgs::Float64 FR_position_msg;
 		std_msgs::Float64 CS_position_msg;
 		
-		FL_position_msg.data = 0.05;
-		FR_position_msg.data = 0.05;
-		CS_position_msg.data = 0.05;
+		FL_position_msg.data = 0.0;
+		FR_position_msg.data = 0.0;
+		CS_position_msg.data = 0.0;
 			
-			double linear_speed = 50;
+			double linear_speed = 10;
       double angular_speed = 0;
 	fl_publish.publish(FL_position_msg);
 	fr_publish.publish(FR_position_msg);
