@@ -72,7 +72,9 @@ add_dependencies(${PROJECT_NAME}_tasks_lib
 
 add_executable(data_integration_node
   src/data_integration.cpp
+  src/fixed_distance_driver.cpp
   src/simple_wheel_controller.cpp
+  src/stationary_align_driver.cpp
   src/task_executor.cpp
 )
 add_dependencies(data_integration_node core_msgs_generate_messages_cpp)
