@@ -26,6 +26,14 @@ public:
   void moveLinear(double linear_speed);
 
   /**
+   * @returns 현재 (목표로 한) 선속도 (m/s)
+   */
+  double getLinearSpeed() const
+  {
+    return linear_speed_;
+  }
+
+  /**
    * 제자리에서 일정한 각속도로 회전합니다. 등속도 운동 중이었다면 등속도 운동을 중지합니다.
    * 양수값을 주면 좌회전(반시계 방향), 음수값을 주면 우회전(시계 방향)합니다.
    * 선운동 중이였다면 선운동을 중지합니다.
@@ -33,6 +41,14 @@ public:
    * @param angular_speed 각속도 (단위: rad/s)
    */
   void turn(double angular_speed);
+
+  /**
+   * @returns 현재 (목표로 한) 각속도 (rad/s)
+   */
+  double getAngularSpeed() const
+  {
+    return angular_speed_;
+  }
 
   /**
    * 선운동 또는 회전을 중지하고 제자리에 정지합니다.

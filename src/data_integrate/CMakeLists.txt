@@ -59,6 +59,11 @@ add_library(${PROJECT_NAME}_tasks_lib
   src/tasks/blue_ball_return_task.cpp
   src/tasks/blue_ball_search_task.cpp
   src/tasks/goal_post_search_task.cpp
+  src/tasks/move_distance.cpp
+  src/tasks/periodic_search_move_once.cpp
+  src/tasks/periodic_search_move_repeat.cpp
+  src/tasks/task.cpp
+  src/tasks/turn_angle.cpp
 )
 add_dependencies(${PROJECT_NAME}_tasks_lib
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
@@ -72,6 +77,7 @@ add_dependencies(${PROJECT_NAME}_tasks_lib
 
 add_executable(data_integration_node
   src/data_integration.cpp
+  src/blackboard.cpp
   src/simple_wheel_controller.cpp
   src/task_executor.cpp
 )

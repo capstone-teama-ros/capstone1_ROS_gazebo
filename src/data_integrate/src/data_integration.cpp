@@ -3,6 +3,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <std_msgs/Float64.h>
 
+#include "data_integrate/blackboard.h"
 #include "data_integrate/features/visible_feature_manager.h"
 #include "data_integrate/simple_wheel_controller.h"
 #include "data_integrate/task_executor.h"
@@ -13,7 +14,6 @@ int main(int argc, char** argv)
   ros::NodeHandle n;
 
   VisibleFeatureManager visible_features;
-  TaskExecutor task_executor(visible_features);
 
   ros::Subscriber sub =
       n.subscribe<sensor_msgs::LaserScan>("/scan", 1000, &VisibleFeatureManager::subscribeToLidar, &visible_features);
@@ -28,6 +28,8 @@ int main(int argc, char** argv)
   ros::Publisher cs_publish = n.advertise<std_msgs::Float64>("/myrobot/CSsuspension_position_controller/command", 10);
 
   SimpleWheelController wheel_controller(fl_wheel, fr_wheel);
+  Blackboard blackboard(visible_features, wheel_controller);
+  TaskExecutor task_executor(blackboard);
 
   ros::Duration sleep_duration(0.025);
 
@@ -44,10 +46,9 @@ int main(int argc, char** argv)
     fl_publish.publish(FL_position_msg);
     fr_publish.publish(FR_position_msg);
     cs_publish.publish(CS_position_msg);
-    ROS_INFO("moving");
 
     // TODO 더 정확한 시간을 사용하기
-    task_executor.runTaskInLoop(sleep_duration.toSec(), sleep_duration.toSec(), wheel_controller);
+    task_executor.runTaskInLoop(sleep_duration.toSec(), sleep_duration.toSec());
 
     sleep_duration.sleep();
     ros::spinOnce();

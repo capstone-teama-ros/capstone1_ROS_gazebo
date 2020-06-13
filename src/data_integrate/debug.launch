@@ -1,0 +1,12 @@
+<launch>
+  <env
+    name="ROSCONSOLE_CONFIG_FILE"
+    value="$(dirname)/debug.config"
+  />
+  <node
+    pkg="data_integrate"
+    type="data_integration_node"
+    name="data_integration"
+    output="screen"
+  />
+</launch>

@@ -102,7 +102,7 @@ void SquareDriver::updateState(double time_passed)
       }
       break;
     default:
-      ROS_ASSERT_MSG(0, "Invalid action state: %d", action_state_);
+      ROS_ASSERT_MSG(0, "Invalid action state: %u", static_cast<unsigned int>(action_state_));
   }
 }
 
@@ -120,7 +120,7 @@ void SquareDriver::updateController(SimpleWheelController& wheel_controller) con
       wheel_controller.turn(turn_speed_);
       break;
     default:
-      ROS_ASSERT_MSG(0, "Invalid action state: %d", action_state_);
+      ROS_ASSERT_MSG(0, "Invalid action state: %u", static_cast<unsigned int>(action_state_));
   }
 }
 

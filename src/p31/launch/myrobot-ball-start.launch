@@ -10,13 +10,16 @@
 
 	<arg name="debug" default="false"/>
 
-	<arg name="x_pos" default="0.6"/>
+	<arg name="x_pos" default="3"/>
 
-  	<arg name="y_pos" default="3.2"/>
+  	<arg name="y_pos" default="0.5"/>
 
-  	<arg name="z_pos" default="0.12"/>
+  	<arg name="z_pos" default="0.51"/>
 
-	<arg name="yo_pos" default="0"/>
+	<arg name="yo_pos" default="1.5708"/>
+
+	<include file="$(find map_generate)/launch/import_world.launch" />
+	<include file="$(find p31_control)/launch/control.launch" />
 
 	<!--include file="$(find gazebo_ros)/launch/empty_world.launch">
 
