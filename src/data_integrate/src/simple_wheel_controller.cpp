@@ -36,6 +36,6 @@ void SimpleWheelController::publish() const
   left_wheel_msg.data = LINEAR_SPEED_FACTOR * linear_speed_ - ANGULAR_SPEED_FACTOR * angular_speed_;
   right_wheel_msg.data = LINEAR_SPEED_FACTOR * linear_speed_ + ANGULAR_SPEED_FACTOR * angular_speed_;
 
-  left_wheel_.publish(left_wheel_msg.data);
-  right_wheel_.publish(right_wheel_msg.data);
+  left_wheel_.publish(left_wheel_msg);
+  right_wheel_.publish(right_wheel_msg);
 }
