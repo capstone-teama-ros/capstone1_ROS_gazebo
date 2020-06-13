@@ -61,6 +61,7 @@ add_library(${PROJECT_NAME}_tasks_lib
   src/tasks/goal_post_search_task.cpp
   src/tasks/move_distance.cpp
   src/tasks/periodic_search_move_once.cpp
+  src/tasks/periodic_search_move_repeat.cpp
   src/tasks/task.cpp
   src/tasks/turn_angle.cpp
 )
