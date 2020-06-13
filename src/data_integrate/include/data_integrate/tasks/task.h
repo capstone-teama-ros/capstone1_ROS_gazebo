@@ -66,6 +66,11 @@ private:
    * @param blackboard 작업 실행에 사용할 Blackboard
    */
   virtual void doHalt(Blackboard &blackboard) = 0;
+
+  /// 현재 Task의 단계를 나타냅니다. 디버그 메시지를 출력하는 용도로만 사용합니다.
+  static unsigned int tick_depth_;
+  /// 현재 Task의 @c halt() 가 호출된 단계를 나타냅니다. 디버그 메시지를 출력하는 용도로만 사용합니다.
+  static unsigned int halt_depth_;
 };
 
 #endif  // DATA_INTEGRATE_TASKS_TASK_H
