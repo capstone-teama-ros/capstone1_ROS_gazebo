@@ -25,7 +25,7 @@ void TaskExecutor::runTaskInLoop(double time_passed_after_last, double time_unti
     ROS_DEBUG("Root task is running");
   }
   else
-    ROS_ASSERT_MSG(0, "Invalid task result: %u", static_cast<unsigned int>(result));
+    ROS_INVALID_TASK_RESULT(result);
 
   // TODO: 여러 task/node가 동시에 바퀴 컨트롤러를 조작하지 못하게 방지하는 장치가 필요하다.
 

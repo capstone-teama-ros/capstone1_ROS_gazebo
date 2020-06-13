@@ -1,6 +1,7 @@
 #ifndef DATA_INTEGRATE_TASKS_TASK_H
 #define DATA_INTEGRATE_TASKS_TASK_H
 
+#include <ros/ros.h>
 #include <memory>
 #include <vector>
 #include "../blackboard.h"
@@ -14,6 +15,9 @@ enum class TaskResult
   Success,  ///< 성공
   Running,  ///< 진행 중
 };
+
+// Task의 실행 결과가 잘못되었을 때 디버깅을 위해 쓰는 매크로
+#define ROS_INVALID_TASK_RESULT(result) ROS_ASSERT_MSG(0, "Invalid task result: %u", static_cast<unsigned int>(result))
 
 /**
  * 모든 작업(Task) 클래스의 기반이 되는 인터페이스 클래스입니다.
