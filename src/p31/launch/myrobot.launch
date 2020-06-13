@@ -15,7 +15,7 @@
   	<arg name="y_pos" default="3.2"/>
 
   	<arg name="z_pos" default="0.12"/>
-	
+
 	<arg name="yo_pos" default="0"/>
 
 	<!--include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -34,9 +34,9 @@
 
 
 
-	<param name="robot_description" command="$(find xacro)/xacro --inorder '/home/jyj/catkin_ws/src/p31/urdf/p31.urdf'"/>
+	<param name="robot_description" command="$(find xacro)/xacro --inorder '$(dirname)/../urdf/p31.urdf'"/>
 
-	
+
 
 	<node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-urdf -model myrobot -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -Y $(arg yo_pos) -param robot_description"/>
 </launch>

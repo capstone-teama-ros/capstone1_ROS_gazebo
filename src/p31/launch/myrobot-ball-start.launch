@@ -34,7 +34,7 @@
 
 
 
-	<param name="robot_description" command="$(find xacro)/xacro --inorder '/home/jyj/catkin_ws/src/p31/urdf/p31.urdf'"/>
+	<param name="robot_description" command="$(find xacro)/xacro --inorder '$(dirname)/../urdf/p31.urdf'"/>
 
 
 
