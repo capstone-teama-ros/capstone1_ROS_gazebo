@@ -2,7 +2,7 @@
 
 #include <ros/ros.h>
 
-TaskResult BlueBallReturnTask::tick(Blackboard &blackboard)
+TaskResult BlueBallReturnTask::doTick(Blackboard &blackboard)
 {
   // TODO 실제 코드를 추가해야 합니다
   ROS_ASSERT_MSG(0, "Not implemented");
@@ -13,7 +13,7 @@ TaskResult BlueBallReturnTask::tick(Blackboard &blackboard)
   // -> GoalPostSearchTask    : 골대가 갑자기 사라졌을 경우 [가능성 낮음]
 }
 
-void BlueBallReturnTask::halt(Blackboard &blackboard)
+void BlueBallReturnTask::doHalt(Blackboard &blackboard)
 {
   // TODO 실제 코드를 추가해야 합니다
   ROS_ASSERT_MSG(0, "Not implemented");

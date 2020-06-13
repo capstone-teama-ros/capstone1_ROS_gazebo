@@ -32,21 +32,40 @@ public:
   using TaskListIter = TaskList::iterator;
 
   /**
+   * 이 작업 클래스의 이름을 돌려줍니다.
+   */
+  virtual const char *name() const = 0;
+
+  /**
    * 이 작업을 한 tick만큼 실행하여 현재 상태를 업데이트하고 결과를 돌려줍니다.
    *
    * @param blackboard 작업 실행에 사용할 Blackboard
    * @returns 작업을 실행한 결과
    */
-  virtual TaskResult tick(Blackboard &blackboard) = 0;
+  TaskResult tick(Blackboard &blackboard);
 
   /**
    * 이 작업과 모든 하위 작업을 중지합니다.
    *
    * @param blackboard 작업 실행에 사용할 Blackboard
    */
-  virtual void halt(Blackboard &blackboard) = 0;
+  void halt(Blackboard &blackboard);
 
 private:
+  /**
+   * @c tick() 의 실제 동작을 맡는 함수입니다. Task를 상속한 클래스는 이 메소드를 재정의하면 됩니다.
+   *
+   * @param blackboard 작업 실행에 사용할 Blackboard
+   * @returns 작업을 실행한 결과
+   */
+  virtual TaskResult doTick(Blackboard &blackboard) = 0;
+
+  /**
+   * @c halt() 의 실제 동작을 맡는 함수입니다. Task를 상속한 클래스는 이 메소드를 재정의하면 됩니다.
+   *
+   * @param blackboard 작업 실행에 사용할 Blackboard
+   */
+  virtual void doHalt(Blackboard &blackboard) = 0;
 };
 
 #endif  // DATA_INTEGRATE_TASKS_TASK_H

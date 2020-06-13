@@ -9,6 +9,12 @@
 class BlueBallCaptureTask : public Task
 {
 public:
+  const char *name() const override
+  {
+    return "BlueBallCaptureTask";
+  }
+
+private:
   /**
    * 이 작업의 현재 상태를 업데이트합니다.
    * 만약 현재 작업을 중지하고 새로운 작업으로 전환해야 할 경우, 새로운 작업을 생성하여 리턴합니다.
@@ -16,9 +22,9 @@ public:
    * @param blackboard 작업 실행에 사용할 Blackboard
    * @returns 작업을 실행한 결과
    */
-  TaskResult tick(Blackboard &blackboard) override;
+  TaskResult doTick(Blackboard &blackboard) override;
 
-  void halt(Blackboard &blackboard) override;
+  void doHalt(Blackboard &blackboard) override;
 };
 
 #endif  // DATA_INTEGRATE_TASKS_BLUE_BALL_CAPTURE_TASK_H

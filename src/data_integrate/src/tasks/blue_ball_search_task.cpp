@@ -2,7 +2,7 @@
 
 #include <ros/ros.h>
 
-TaskResult BlueBallSearchTask::tick(Blackboard &blackboard)
+TaskResult BlueBallSearchTask::doTick(Blackboard &blackboard)
 {
   // TODO 실제 코드를 추가해야 합니다
   ROS_ASSERT_MSG(0, "Not implemented");
@@ -13,7 +13,7 @@ TaskResult BlueBallSearchTask::tick(Blackboard &blackboard)
   // -> BlueBallDeliverTask   :(없음)
 }
 
-void BlueBallSearchTask::halt(Blackboard &blackboard)
+void BlueBallSearchTask::doHalt(Blackboard &blackboard)
 {
   // TODO 실제 코드를 추가해야 합니다
   ROS_ASSERT_MSG(0, "Not implemented");
