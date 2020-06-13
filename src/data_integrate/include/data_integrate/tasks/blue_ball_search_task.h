@@ -14,7 +14,11 @@ public:
     return "BlueBallSearchTask";
   }
 
+  BlueBallSearchTask();
+
 private:
+  TaskPtr search_task_;
+
   /**
    * 이 작업의 현재 상태를 업데이트합니다.
    * 만약 현재 작업을 중지하고 새로운 작업으로 전환해야 할 경우, 새로운 작업을 생성하여 리턴합니다.
