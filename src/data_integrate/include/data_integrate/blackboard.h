@@ -44,6 +44,18 @@ public:
     time_until_next_tick_ = time_until_next_tick;
   }
 
+  /**
+   * TODO: Implement this
+   * @returns 로봇의 현재 선속력 (m/s). 0 이상의 값입니다.
+   */
+  double getRobotLinearSpeed() const;
+
+  /**
+   * TODO: Implement this
+   * @returns 로봇의 현재 회전 속도 (rad/s)
+   */
+  double getRobotAngularSpeed() const;
+
 private:
   double time_since_last_tick_ = 0;
   double time_until_next_tick_ = 0;
