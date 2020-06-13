@@ -18,6 +18,9 @@
 
 	<arg name="yo_pos" default="1.5708"/>
 
+	<include file="$(find map_generate)/launch/import_world.launch" />
+	<include file="$(find p31_control)/launch/control.launch" />
+
 	<!--include file="$(find gazebo_ros)/launch/empty_world.launch">
 
 		<arg name="debug" value="$(arg debug)"/>
