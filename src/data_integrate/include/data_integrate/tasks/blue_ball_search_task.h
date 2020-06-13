@@ -2,6 +2,7 @@
 #define DATA_INTEGRATE_TASKS_BLUE_BALL_SEARCH_TASK_H
 
 #include "../fixed_distance_driver.h"
+#include "../square_driver.h"
 #include "../stationary_align_driver.h"
 #include "./task.h"
 
@@ -27,6 +28,7 @@ private:
   FixedDistanceDriver line_driver_;
   StationaryAlignDriver turn_driver_;
   bool has_started_ = false;
+  SquareDriver square_driver_;
 };
 
 #endif  // DATA_INTEGRATE_TASKS_BLUE_BALL_SEARCH_TASK_H

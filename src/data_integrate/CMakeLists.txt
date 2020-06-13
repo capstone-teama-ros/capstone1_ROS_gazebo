@@ -74,6 +74,7 @@ add_executable(data_integration_node
   src/data_integration.cpp
   src/fixed_distance_driver.cpp
   src/simple_wheel_controller.cpp
+  src/square_driver.cpp
   src/stationary_align_driver.cpp
   src/task_executor.cpp
 )
