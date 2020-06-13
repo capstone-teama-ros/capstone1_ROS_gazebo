@@ -17,18 +17,17 @@ void LinearMoveDriver::updatePoint(double rel_x, double rel_y)
 
 void LinearMoveDriver::updateController(SimpleWheelController& wheel_controller) const
 {
+  // 목표지점까지 가는 와중에 목표물과 일정거리 이하라면 멈추고 align 확인합니다.
   auto distance = std::hypot(rel_x_, rel_y_);
-
-  // 줍고자 하는 공이랑 align이 잘 되어있는 확인!
-
-  if (std::abs(std::atan(rel_x / rel_y)) > align_threshold_)
+  if (distance <= distance_threshold_)
   {
     wheel_controller.stop();
     return;
   }
 
-  // 목표지점까지 가는 와중에 목표물과 일정거리 이하라면 멈추고 align 확인합니다.
-  if (distance <= distance_threshold_)
+  // 줍고자 하는 공이랑 align이 잘 되어있는 확인!
+  auto angle = std::atan2(rel_y, rel_x);
+  if (std::abs(angle) > align_threshold_)
   {
     wheel_controller.stop();
     return;
