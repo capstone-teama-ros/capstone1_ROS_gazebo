@@ -46,7 +46,6 @@ int main(int argc, char** argv)
     fl_publish.publish(FL_position_msg);
     fr_publish.publish(FR_position_msg);
     cs_publish.publish(CS_position_msg);
-    ROS_INFO("moving");
 
     // TODO 더 정확한 시간을 사용하기
     task_executor.runTaskInLoop(sleep_duration.toSec(), sleep_duration.toSec());
