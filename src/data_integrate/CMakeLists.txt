@@ -73,6 +73,7 @@ add_dependencies(${PROJECT_NAME}_tasks_lib
 
 add_executable(data_integration_node
   src/data_integration.cpp
+  src/blackboard.cpp
   src/simple_wheel_controller.cpp
   src/task_executor.cpp
 )
