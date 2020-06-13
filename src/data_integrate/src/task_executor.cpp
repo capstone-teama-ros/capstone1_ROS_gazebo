@@ -7,14 +7,25 @@ void TaskExecutor::runTaskInLoop(double time_passed_after_last, double time_unti
 {
   ROS_ASSERT_MSG(task_, "Missing task");
 
-  // 현재 작업을 업데이트하고, 필요하면 새로운 작업으로 전환합니다.
+  // 현재 작업을 업데이트합니다.
   blackboard_.setTimeSinceLastTick(time_passed_after_last);
   blackboard_.setTimeUntilNextTick(time_until_next);
-  auto nextTask = task_->tick(blackboard_);
-  if (nextTask)
+  auto result = task_->tick(blackboard_);
+
+  if (result == TaskResult::Success)
   {
-    task_ = std::move(nextTask);
+    ROS_DEBUG("Root task has succeeded");
   }
+  else if (result == TaskResult::Failure)
+  {
+    ROS_WARN("Root task has failed");
+  }
+  else if (result == TaskResult::Running)
+  {
+    ROS_DEBUG("Root task is running");
+  }
+  else
+    ROS_ASSERT_MSG(0, "Invalid task result: %u", static_cast<unsigned int>(result));
 
   // TODO: 여러 task/node가 동시에 바퀴 컨트롤러를 조작하지 못하게 방지하는 장치가 필요하다.
 
