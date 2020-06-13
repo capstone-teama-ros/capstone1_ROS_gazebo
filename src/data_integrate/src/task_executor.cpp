@@ -3,22 +3,23 @@
 #include <ros/ros.h>
 #include <utility>
 
-void TaskExecutor::runTaskInLoop(double time_passed_after_last, double time_until_next,
-                                 SimpleWheelController &wheel_controller)
+void TaskExecutor::runTaskInLoop(double time_passed_after_last, double time_until_next)
 {
   ROS_ASSERT_MSG(task_, "Missing task");
 
   // 현재 작업을 업데이트하고, 필요하면 새로운 작업으로 전환합니다.
-  auto nextTask = task_->updateTaskOrMakeNextTask(time_passed_after_last, visible_features_, past_features_);
+  blackboard_.setTimeSinceLastTick(time_passed_after_last);
+  blackboard_.setTimeUntilNextTick(time_until_next);
+  auto nextTask = task_->tick(blackboard_);
   if (nextTask)
   {
     task_ = std::move(nextTask);
   }
 
-  // 업데이트한 작업의 결정에 따라 바퀴 컨트롤러의 상태를 업데이트합니다.
-  task_->updateWheelController(time_until_next, wheel_controller);
+  // TODO: 여러 task/node가 동시에 바퀴 컨트롤러를 조작하지 못하게 방지하는 장치가 필요하다.
+
   // 바퀴 컨트롤러를 통해 메시지를 전파합니다.
-  wheel_controller.publish();
+  blackboard_.wheel_controller_.publish();
 }
 
 void TaskExecutor::overrideTask(Task::TaskPtr task)
