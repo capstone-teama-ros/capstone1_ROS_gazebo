@@ -4,7 +4,7 @@
 #include <ros/ros.h>
 
 BlueBallSearchTask::BlueBallSearchTask()
-  : line_driver_(10, -10, 0.01), turn_driver_(1, 0.02, 0.05), square_driver_(5, 2.5, angles::from_degrees(30), 5)
+  : line_driver_(10, -10, 0.01), turn_driver_(1, 0.02, 0.05), square_driver_(5, 2.5, angles::from_degrees(30), 2)
 {
 }
 
