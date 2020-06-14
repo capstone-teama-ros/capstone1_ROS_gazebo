@@ -1,5 +1,6 @@
 #include <core_msgs/ball_position.h>
 #include <ros/ros.h>
+#include <sensor_msgs/Imu.h>
 #include <sensor_msgs/LaserScan.h>
 #include <std_msgs/Float64.h>
 
@@ -20,6 +21,8 @@ int main(int argc, char** argv)
   ros::Subscriber sub_ball_harvest = n.subscribe<core_msgs::ball_position>(
       "/position", 1000, &VisibleFeatureManager::subscribeToCamera, &visible_features);
   // ros::Subscriber sub_line_tracing = n.subscribe<core_msgs::line_info>("/line_info", 1000, camera_Callback_2);
+  ros::Subscriber sub_imu =
+      n.subscribe<sensor_msgs::Imu>("/imu", 1000, &VisibleFeatureManager::subscribeToImu, &visible_features);
 
   ros::Publisher fl_wheel = n.advertise<std_msgs::Float64>("/myrobot/FLwheel_velocity_controller/command", 10);
   ros::Publisher fr_wheel = n.advertise<std_msgs::Float64>("/myrobot/FRwheel_velocity_controller/command", 10);
