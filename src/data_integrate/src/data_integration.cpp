@@ -1,14 +1,16 @@
+#include <angles/angles.h>
 #include <core_msgs/ball_position.h>
 #include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/LaserScan.h>
 #include <std_msgs/Float64.h>
+#include <vector>
 
 #include "data_integrate/blackboard.h"
 #include "data_integrate/features/visible_feature_manager.h"
 #include "data_integrate/simple_wheel_controller.h"
 #include "data_integrate/task_executor.h"
-#include "data_integrate/tasks/blue_ball_search_task.h"
+#include "data_integrate/tasks/turn_angle.h"
 
 int main(int argc, char** argv)
 {
@@ -35,7 +37,17 @@ int main(int argc, char** argv)
   Blackboard blackboard(visible_features, wheel_controller);
   TaskExecutor task_executor(blackboard);
 
-  task_executor.overrideTask(Task::TaskPtr(new BlueBallSearchTask()));
+  std::vector<double> test_angles{
+    0,
+    angles::from_degrees(15),
+    angles::from_degrees(30),
+    angles::from_degrees(45),
+    angles::from_degrees(60),
+    angles::from_degrees(75),
+    angles::from_degrees(90),
+  };
+  auto current_angle = test_angles.begin();
+  int counter = 0;
 
   ros::Duration sleep_duration(0.025);
 
@@ -52,6 +64,17 @@ int main(int argc, char** argv)
     fl_publish.publish(FL_position_msg);
     fr_publish.publish(FR_position_msg);
     cs_publish.publish(CS_position_msg);
+
+    --counter;
+    if (counter < 0)
+    {
+      counter = 500;
+      task_executor.overrideTask(Task::TaskPtr(new TurnAngle(100000, *current_angle)));
+
+      ++current_angle;
+      if (current_angle == test_angles.end())
+        current_angle = test_angles.begin();
+    }
 
     // TODO 더 정확한 시간을 사용하기
     task_executor.runTaskInLoop(sleep_duration.toSec(), sleep_duration.toSec());
