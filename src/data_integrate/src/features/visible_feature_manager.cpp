@@ -71,4 +71,7 @@ void VisibleFeatureManager::subscribeToImu(const sensor_msgs::Imu::ConstPtr& msg
   // 주의: 창시구 규정에 의해 orientation은 사용 금지됨
   imu_angular_velocity_ = msg->angular_velocity;
   imu_linear_acceleration_ = msg->linear_acceleration;
+
+  // 수치적분을 위한 timestamp
+  imu_timestamp_ = msg->header.stamp.toSec();
 }

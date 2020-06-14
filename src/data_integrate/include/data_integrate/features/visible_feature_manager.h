@@ -99,6 +99,7 @@ private:
   bool is_blue_ball_captured_ = false;
   ImuVectorT imu_angular_velocity_;     ///< (x축, y축, z축) (rad/s)
   ImuVectorT imu_linear_acceleration_;  ///< (x, y, z) (m/s^2)
+  double imu_timestamp_ = 0;
 };
 
 #endif  // DATA_INTEGRATE_FEATURES_VISIBLE_FEATURE_MANAGER_H
