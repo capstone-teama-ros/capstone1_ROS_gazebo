@@ -10,6 +10,5 @@ double Blackboard::getRobotLinearSpeed() const
 
 double Blackboard::getRobotAngularSpeed() const
 {
-  // TODO: 진짜 각속도를 구해야 함
-  return wheel_controller_.getAngularSpeed();
+  return visible_features_.getImuAngularVelocity().z;
 }
