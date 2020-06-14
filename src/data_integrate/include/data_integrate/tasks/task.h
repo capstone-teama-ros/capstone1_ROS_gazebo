@@ -1,44 +1,76 @@
 #ifndef DATA_INTEGRATE_TASKS_TASK_H
 #define DATA_INTEGRATE_TASKS_TASK_H
 
+#include <ros/ros.h>
 #include <memory>
-#include "../features/past_feature_manager.h"
-#include "../features/visible_feature_manager.h"
-#include "../simple_wheel_controller.h"
+#include <vector>
+#include "../blackboard.h"
+
+/**
+ * 한 작업(Task)을 한 tick만큼 실행한 뒤의 결과를 나타냅니다.
+ */
+enum class TaskResult
+{
+  Failure,  ///< 실패
+  Success,  ///< 성공
+  Running,  ///< 진행 중
+};
+
+// Task의 실행 결과가 잘못되었을 때 디버깅을 위해 쓰는 매크로
+#define ROS_INVALID_TASK_RESULT(result) ROS_ASSERT_MSG(0, "Invalid task result: %u", static_cast<unsigned int>(result))
 
 /**
  * 모든 작업(Task) 클래스의 기반이 되는 인터페이스 클래스입니다.
+ * Behavior tree의 node를 나타냅니다.
  */
 class Task
 {
 public:
-  /// @c updateTaskOrMakeNextTask() 가 작업을 리턴할 때 반환하는 포인터의 자료형
+  /// 하위 작업을 관리하기 위한 스마트 포인터의 자료형
   using TaskPtr = std::unique_ptr<Task>;
+  using TaskList = std::vector<TaskPtr>;
+  using TaskListIter = TaskList::iterator;
 
   /**
-   * 이 작업의 현재 상태를 업데이트합니다.
-   * 만약 현재 작업을 중지하고 새로운 작업으로 전환해야 할 경우, 새로운 작업을 생성하여 리턴합니다.
-   *
-   * @param time_passed_after_last  직전의 상태 업데이트를 호출한 이후, 실제로 지난 시간 (seconds)
-   * @param visible_features        가장 최근에 관측된 지형지물 정보
-   * @param past_features           기억하고 있는 지형지물 정보
-   * @returns 현재 작업을 계속 진행해야 할 경우 @c nullptr 를 리턴하면 됩니다.
-   * 현재 작업을 중지하고 새로운 작업으로 전환해야 할 경우, 새로운 작업의 클래스를 @c std::make_unique() 로 생성하여
-   * 리턴하면 됩니다.
+   * 이 작업 클래스의 이름을 돌려줍니다.
    */
-  virtual TaskPtr updateTaskOrMakeNextTask(double time_passed_after_last, const VisibleFeatureManager &visible_features,
-                                           const PastFeatureManager &past_features) = 0;
+  virtual const char *name() const = 0;
 
   /**
-   * 현재 상태에 알맞게 바퀴 컨트롤러의 상태를 업데이트합니다.
-   * 이 함수는 @c updateTaskOrMakeNextTask() 를 호출한 직후에 바로 호출됩니다.
-   * 만약 @c updateTaskOrMakeNextTask() 에 의해 작업이 전환되었다면, 새로운 작업이 대신 @c updateWheelController() 를
-   * 호출받습니다.
+   * 이 작업을 한 tick만큼 실행하여 현재 상태를 업데이트하고 결과를 돌려줍니다.
    *
-   * @param time_until_next   다음 상태 업데이트까지 예상되는 시간 간격 (seconds)
-   * @param wheel_controller  운전 명령을 받을 바퀴 컨트롤러 객체
+   * @param blackboard 작업 실행에 사용할 Blackboard
+   * @returns 작업을 실행한 결과
    */
-  virtual void updateWheelController(double time_until_next, SimpleWheelController &wheel_controller) = 0;
+  TaskResult tick(Blackboard &blackboard);
+
+  /**
+   * 이 작업과 모든 하위 작업을 중지합니다.
+   *
+   * @param blackboard 작업 실행에 사용할 Blackboard
+   */
+  void halt(Blackboard &blackboard);
+
+private:
+  /**
+   * @c tick() 의 실제 동작을 맡는 함수입니다. Task를 상속한 클래스는 이 메소드를 재정의하면 됩니다.
+   *
+   * @param blackboard 작업 실행에 사용할 Blackboard
+   * @returns 작업을 실행한 결과
+   */
+  virtual TaskResult doTick(Blackboard &blackboard) = 0;
+
+  /**
+   * @c halt() 의 실제 동작을 맡는 함수입니다. Task를 상속한 클래스는 이 메소드를 재정의하면 됩니다.
+   *
+   * @param blackboard 작업 실행에 사용할 Blackboard
+   */
+  virtual void doHalt(Blackboard &blackboard) = 0;
+
+  /// 현재 Task의 단계를 나타냅니다. 디버그 메시지를 출력하는 용도로만 사용합니다.
+  static unsigned int tick_depth_;
+  /// 현재 Task의 @c halt() 가 호출된 단계를 나타냅니다. 디버그 메시지를 출력하는 용도로만 사용합니다.
+  static unsigned int halt_depth_;
 };
 
 #endif  // DATA_INTEGRATE_TASKS_TASK_H

@@ -2,9 +2,7 @@
 
 #include <ros/ros.h>
 
-Task::TaskPtr GoalPostSearchTask::updateTaskOrMakeNextTask(double time_passed_after_last,
-                                                           const VisibleFeatureManager &visible_features,
-                                                           const PastFeatureManager &past_features)
+TaskResult GoalPostSearchTask::doTick(Blackboard &blackboard)
 {
   // TODO 실제 코드를 추가해야 합니다
   ROS_ASSERT_MSG(0, "Not implemented");
@@ -15,7 +13,7 @@ Task::TaskPtr GoalPostSearchTask::updateTaskOrMakeNextTask(double time_passed_af
   // -> BlueBallDeliverTask   : ★ 골대를 찾았을 경우
 }
 
-void GoalPostSearchTask::updateWheelController(double time_until_next, SimpleWheelController &wheel_controller)
+void GoalPostSearchTask::doHalt(Blackboard &blackboard)
 {
   // TODO 실제 코드를 추가해야 합니다
   ROS_ASSERT_MSG(0, "Not implemented");
