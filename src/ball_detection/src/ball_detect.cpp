@@ -88,22 +88,6 @@ vector<float> pixel2point(Point center, int radius)
   return position;
 }
 
-// Changing int variable to string.
-string intToString(int n)
-{
-  stringstream s;
-  s << n;
-  return s.str();
-}
-
-// Changing float variable to string.
-string floatToString(float f)
-{
-  ostringstream buffer;
-  buffer << f;
-  return buffer.str();
-}
-
 void ball_detect()
 {
   // Declare intrinsic and distortions by using the variable declared before.
@@ -248,9 +232,9 @@ void ball_detect()
       float isy = ball_pos_b[1];
       float isz = ball_pos_b[2];
 
-      string sx = floatToString(isx);
-      string sy = floatToString(isy);
-      string sz = floatToString(isz);
+      string sx = std::to_string(isx);
+      string sy = std::to_string(isy);
+      string sz = std::to_string(isz);
 
       string text;
       text = "x: " + sx + ", y: " + sy + ", z: " + sz;
@@ -284,9 +268,9 @@ void ball_detect()
       float isy = ball_pos_r[1];
       float isz = ball_pos_r[2];
 
-      string sx = floatToString(isx);
-      string sy = floatToString(isy);
-      string sz = floatToString(isz);
+      string sx = std::to_string(isx);
+      string sy = std::to_string(isy);
+      string sz = std::to_string(isz);
 
       string text;
       text = "x: " + sx + ", y: " + sy + ", z: " + sz;
@@ -324,9 +308,9 @@ void ball_detect()
       float isy = ball_pos_g[1];
       float isz = ball_pos_g[2];
 
-      string sx = floatToString(isx);
-      string sy = floatToString(isy);
-      string sz = floatToString(isz);
+      string sx = std::to_string(isx);
+      string sy = std::to_string(isy);
+      string sz = std::to_string(isz);
 
       string text;
       text = "x: " + sx + ", y: " + sy + ", z: " + sz;
