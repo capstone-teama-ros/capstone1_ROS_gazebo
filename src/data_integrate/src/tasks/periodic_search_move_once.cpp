@@ -8,7 +8,7 @@
 PeriodicSearchMoveOnce::PeriodicSearchMoveOnce()
 {
   subtasks_.push_back(TaskPtr(new TurnAngle(angles::from_degrees(90))));
-  subtasks_.push_back(TaskPtr(new TurnAngle(angles::from_degrees(-180))));
+  subtasks_.push_back(TaskPtr(new TurnAngle(angles::from_degrees(-90))));
   subtasks_.push_back(TaskPtr(new MoveDistance(1)));
 
   current_subtask_ = subtasks_.begin();
