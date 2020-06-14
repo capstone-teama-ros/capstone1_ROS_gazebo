@@ -1,20 +1,21 @@
+
+#include <core_msgs/ball_position.h>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
-#include <math.h>
 #include <ros/ros.h>
 #include <std_msgs/ColorRGBA.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <visualization_msgs/Marker.h>
 #include <algorithm>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
 #include <iostream>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/opencv.hpp>
 #include <opencv2/opencv_modules.hpp>
 #include <string>
-#include "core_msgs/ball_position.h"
-#include "opencv2/imgcodecs.hpp"
-#include "opencv2/opencv.hpp"
 
 #define PI 3.14159265
 
@@ -31,7 +32,7 @@ int low_h_b = 100, low_s_b = 126, low_v_b = 60;
 int high_h_b = 121, high_s_b = 255, high_v_b = 255;
 int low_h_g = 50, low_s_g = 126, low_v_g = 60;
 int high_h_g = 70, high_s_g = 255, high_v_g = 255;  // 임의로 초록색 범위 설정 실험후 조정 필요할듯?
-int low_b_b = 150;
+int low_b_b = 150, high_g_b = 50, high_r_b = 50;
 
 // Initialization of variable for camera calibration paramters.
 // You should change this if you changed the size of the image.
@@ -41,9 +42,10 @@ float distortion_data[5] = { 0, 0, 0, 0, 0 };
 
 // Initialization of variable for text drawing
 String text;
-int iMin_tracking_ball_size =
-    5;                        // Minimum ball radius size by pixels. If ball is smaller than this, it won't be searched.
-float fball_diameter = 0.14;  // Initialization of variable for dimension of the target(real ball diameter by meter)
+// Minimum ball radius size by pixels. If ball is smaller than this, it won't be searched.
+int iMin_tracking_ball_size = 5;
+// Initialization of variable for dimension of the target(real ball diameter by meter)
+float fball_diameter = 0.14;
 
 // Setting Mat variables for images.
 Mat buffer;
@@ -86,20 +88,16 @@ vector<float> pixel2point(Point center, int radius)
   return position;
 }
 
-// Changing int variable to string.
-string intToString(int n)
+/**
+ * 3차원 벡터 또는 점을 문자열로 변환합니다.
+ */
+std::string pointToString(std::vector<float> point)
 {
-  stringstream s;
-  s << n;
-  return s.str();
-}
+  ROS_ASSERT_MSG(point.size() >= 3, "point must have 3 values or more");
 
-// Changing float variable to string.
-string floatToString(float f)
-{
-  ostringstream buffer;
-  buffer << f;
-  return buffer.str();
+  std::stringstream ss;
+  ss << "x: " << point[0] << ", y: " << point[1] << ", z: " << point[2];
+  return ss.str();
 }
 
 void ball_detect()
@@ -220,14 +218,15 @@ void ball_detect()
   int rball_num = 0;
   int gball_num = 0;
 
+  // declare colors. Scalar(blue, green, red)
+  const Scalar COLOR_BLUE(255, 0, 0);
+  const Scalar COLOR_GREEN(0, 255, 0);
+  const Scalar COLOR_RED(0, 0, 255);
+
   for (size_t i = 0; i < contours_b.size(); i++)
   {
     if (radius_b[i] > iMin_tracking_ball_size)
     {
-      // declare colors. Scalar(blue, green, red)
-      Scalar color = Scalar(255, 0, 0);
-      Scalar color_g = Scalar(0, 255, 0);
-
       // find the pixel point of the circle cneter, and the pixel radius of an circle
 
       float px_b = center_b[i].x;
@@ -242,18 +241,10 @@ void ball_detect()
       // draw the circle at the result Mat matrix
       // putText puts text at the matrix, puts text, at the point of an image
 
-      float isx = ball_pos_b[0];
-      float isy = ball_pos_b[1];
-      float isz = ball_pos_b[2];
+      std::string text = pointToString(ball_pos_b);
 
-      string sx = floatToString(isx);
-      string sy = floatToString(isy);
-      string sz = floatToString(isz);
-
-      string text;
-      text = "x: " + sx + ", y: " + sy + ", z: " + sz;
-      putText(result, text, center_b[i], 2, 1, color_g, 2);
-      circle(result, center_b[i], (int)radius_b[i], color, 2, 8, 0);
+      putText(result, text, center_b[i], 2, 1, COLOR_GREEN, 2);
+      circle(result, center_b[i], (int)radius_b[i], COLOR_BLUE, 2, 8, 0);
       bball_num = bball_num + 1;
 
       // push back variables of real ball position to the message variable
@@ -268,9 +259,6 @@ void ball_detect()
   {
     if (radius_r[i] > iMin_tracking_ball_size)
     {
-      Scalar color = Scalar(0, 0, 255);
-      Scalar color_g = Scalar(0, 255, 0);
-
       float px_r = center_r[i].x;
       float py_r = center_r[i].y;
       float pr_r = radius_r[i];
@@ -278,18 +266,10 @@ void ball_detect()
       vector<float> ball_pos_r;
       ball_pos_r = pixel2point(center_r[i], radius_r[i]);
 
-      float isx = ball_pos_r[0];
-      float isy = ball_pos_r[1];
-      float isz = ball_pos_r[2];
+      std::string text = pointToString(ball_pos_r);
 
-      string sx = floatToString(isx);
-      string sy = floatToString(isy);
-      string sz = floatToString(isz);
-
-      string text;
-      text = "x: " + sx + ", y: " + sy + ", z: " + sz;
-      putText(result, text, center_r[i], 2, 1, color_g, 2);
-      circle(result, center_r[i], (int)radius_r[i], color, 2, 8, 0);
+      putText(result, text, center_r[i], 2, 1, COLOR_GREEN, 2);
+      circle(result, center_r[i], (int)radius_r[i], COLOR_RED, 2, 8, 0);
       rball_num = rball_num + 1;
       msg1.red_x.push_back(ball_pos_r[0]);
       msg1.red_y.push_back(ball_pos_r[2]);
@@ -300,10 +280,6 @@ void ball_detect()
   {
     if (radius_g[i] > iMin_tracking_ball_size)
     {
-      // declare colors. Scalar(blue, green, red)
-      Scalar color = Scalar(255, 0, 0);
-      Scalar color_g = Scalar(0, 255, 0);
-
       // find the pixel point of the circle cneter, and the pixel radius of an circle
 
       float px_g = center_g[i].x;
@@ -318,18 +294,10 @@ void ball_detect()
       // draw the circle at the result Mat matrix
       // putText puts text at the matrix, puts text, at the point of an image
 
-      float isx = ball_pos_g[0];
-      float isy = ball_pos_g[1];
-      float isz = ball_pos_g[2];
+      std::string text = pointToString(ball_pos_g);
 
-      string sx = floatToString(isx);
-      string sy = floatToString(isy);
-      string sz = floatToString(isz);
-
-      string text;
-      text = "x: " + sx + ", y: " + sy + ", z: " + sz;
-      putText(result, text, center_g[i], 2, 1, color_g, 2);
-      circle(result, center_g[i], (int)radius_g[i], color, 2, 8, 0);
+      putText(result, text, center_g[i], 2, 1, COLOR_GREEN, 2);
+      circle(result, center_g[i], (int)radius_g[i], COLOR_GREEN, 2, 8, 0);
       gball_num = gball_num + 1;
 
       // push back variables of real ball position to the message variable
@@ -369,10 +337,13 @@ void ball_detect()
 void ball_check()
 {
   //  core_msgs::ball_position msg;
-  //  ROS_INFO("%s", buffer2.at<Vec3b>(320,240)[0].c_str());          //확인해보려고 출력해보려했는데 오류떠서
-  //  지워놨습니다.
-  if (buffer2.at<Vec3b>(320, 240)[0] > low_b_b)
-  {  //두번째 카메라에서 (320,240)의 b값이 최소값보다 큰지 확인한건데 원하는 위치에 맞게 조정 및 파란색만 잘 확인 될지
+  //  확인해보려고 출력해보려했는데 오류떠서 지워놨습니다.
+  //  ROS_INFO("%s", buffer2.at<Vec3b>(320,240)[0].c_str());
+
+  //  두번째 카메라에서 (320,240)의 b값이 최소값보다 큰지 확인한건데 원하는 위치에 맞게 조정 및 파란색만 잘 확인 될지
+  if (buffer2.at<Vec3b>(320, 240)[0] > low_b_b && buffer2.at<Vec3b>(320, 240)[1] < high_g_b &&
+      buffer2.at<Vec3b>(320, 240)[2] < high_r_b)
+  {
     msg1.still_blue = 1;
   }
   else
@@ -406,7 +377,7 @@ void imageCallback2(const sensor_msgs::ImageConstPtr& msg)
   if (msg->height == 480 && buffer.size().width == 320)
   {  // check the size of the image received. if the image have 640x480, then change the buffer size to 640x480.
     std::cout << "resized" << std::endl;
-    cv::resize(buffer, buffer, cv::Size(640, 480));
+    cv::resize(buffer2, buffer2, cv::Size(640, 480));
   }
   try
   {
@@ -426,8 +397,8 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;                         // create node handler
   image_transport::ImageTransport it(nh);     // create image transport and connect it to node hnalder
   image_transport::Subscriber sub1 = it.subscribe(
-      "/camera1/rgb/image_raw", 1, imageCallback1);  //카메라 패키지의 이름을 변경할 수 있다고 가정하고 작성함
-  image_transport::Subscriber sub2 = it.subscribe("/camera2/rgb/image_raw", 1, imageCallback2);
+      "/camera/rgb/image_raw", 1, imageCallback1);  //카메라 패키지의 이름을 변경할 수 있다고 가정하고 작성함
+  image_transport::Subscriber sub2 = it.subscribe("/camera2/rgb/image_raw2", 1, imageCallback2);
   pub = nh.advertise<core_msgs::ball_position>("/position", 1);  // setting publisher
   ros::Rate loop_rate(30);
   namedWindow("result", WINDOW_NORMAL);
