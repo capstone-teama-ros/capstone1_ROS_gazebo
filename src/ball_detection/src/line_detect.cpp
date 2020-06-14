@@ -84,6 +84,12 @@ void colorthresh(cv::Mat input) {
   pt2.y = rect.y + rect.height;
   pt3.x = pt1.x+5;
   pt3.y = pt1.y-5;
+
+  msg1.x = pt1.x;
+  msg1.y = pt1.y;
+  msg1.w = rect.width;
+  msg1.h = rect.height;
+
   // Drawing the rectangle using points obtained
   rectangle(input, pt1, pt2, CV_RGB(255, 0, 0), 2);
   // Inserting text box
