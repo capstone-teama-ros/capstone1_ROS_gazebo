@@ -88,6 +88,18 @@ vector<float> pixel2point(Point center, int radius)
   return position;
 }
 
+/**
+ * 3차원 벡터 또는 점을 문자열로 변환합니다.
+ */
+std::string pointToString(std::vector<float> point)
+{
+  ROS_ASSERT_MSG(point.size() >= 3, "point must have 3 values or more");
+
+  std::stringstream ss;
+  ss << "x: " << point[0] << ", y: " << point[1] << ", z: " << point[2];
+  return ss.str();
+}
+
 void ball_detect()
 {
   // Declare intrinsic and distortions by using the variable declared before.
@@ -228,16 +240,8 @@ void ball_detect()
       // draw the circle at the result Mat matrix
       // putText puts text at the matrix, puts text, at the point of an image
 
-      float isx = ball_pos_b[0];
-      float isy = ball_pos_b[1];
-      float isz = ball_pos_b[2];
+      std::string text = pointToString(ball_pos_b);
 
-      string sx = std::to_string(isx);
-      string sy = std::to_string(isy);
-      string sz = std::to_string(isz);
-
-      string text;
-      text = "x: " + sx + ", y: " + sy + ", z: " + sz;
       putText(result, text, center_b[i], 2, 1, color_g, 2);
       circle(result, center_b[i], (int)radius_b[i], color, 2, 8, 0);
       bball_num = bball_num + 1;
@@ -264,16 +268,8 @@ void ball_detect()
       vector<float> ball_pos_r;
       ball_pos_r = pixel2point(center_r[i], radius_r[i]);
 
-      float isx = ball_pos_r[0];
-      float isy = ball_pos_r[1];
-      float isz = ball_pos_r[2];
+      std::string text = pointToString(ball_pos_r);
 
-      string sx = std::to_string(isx);
-      string sy = std::to_string(isy);
-      string sz = std::to_string(isz);
-
-      string text;
-      text = "x: " + sx + ", y: " + sy + ", z: " + sz;
       putText(result, text, center_r[i], 2, 1, color_g, 2);
       circle(result, center_r[i], (int)radius_r[i], color, 2, 8, 0);
       rball_num = rball_num + 1;
@@ -304,16 +300,8 @@ void ball_detect()
       // draw the circle at the result Mat matrix
       // putText puts text at the matrix, puts text, at the point of an image
 
-      float isx = ball_pos_g[0];
-      float isy = ball_pos_g[1];
-      float isz = ball_pos_g[2];
+      std::string text = pointToString(ball_pos_g);
 
-      string sx = std::to_string(isx);
-      string sy = std::to_string(isy);
-      string sz = std::to_string(isz);
-
-      string text;
-      text = "x: " + sx + ", y: " + sy + ", z: " + sz;
       putText(result, text, center_g[i], 2, 1, color_g, 2);
       circle(result, center_g[i], (int)radius_g[i], color, 2, 8, 0);
       gball_num = gball_num + 1;
