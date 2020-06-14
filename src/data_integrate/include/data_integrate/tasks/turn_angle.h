@@ -18,11 +18,13 @@ public:
 
   /**
    * @param angle 회전할 각도 (radians)
+   * @param max_turn_speed 최대 회전 속도 (rad/s). 0 이상의 값이어야 합니다. 기본값은 MAX_TURN_SPEED입니다.
    */
-  TurnAngle(double angle) : angle_(angle){};
+  TurnAngle(double angle, double max_turn_speed = MAX_TURN_SPEED) : angle_(angle), max_turn_speed_(max_turn_speed){};
 
 private:
   double angle_;
+  double max_turn_speed_;
   double amount_turned_ = 0;
   bool is_first_tick_ = true;
 

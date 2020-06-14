@@ -61,6 +61,14 @@ public:
    */
   void publish() const;
 
+  /**
+   * 로봇이 제자리에서 일정한 각속도로 회전하기 위해 각 바퀴에 전달해야 하는 속도 신호값을 계산합니다.
+   *
+   * @param robot_angular_velocity  로봇의 반시계 방향 회전 속도 (rad/s). 0보다 작으면 시계 방향의 회전 속도입니다.
+   * @returns 우측 바퀴에 전달할 속도 신호값. 좌측 바퀴에는 이 값과 크기는 같고 부호가 반대인 신호값을 전달해야 합니다.
+   */
+  static double convertRobotAngularVelocityToWheelVelocity(double angular_velocity);
+
 private:
   double linear_speed_ = 0;
   double angular_speed_ = 0;
