@@ -35,8 +35,8 @@ void SimpleWheelController::publish() const
   std_msgs::Float64 left_wheel_msg;
   std_msgs::Float64 right_wheel_msg;
 
-  // TODO: 올바른 계수를 직접 계산하거나 실험적으로 구해야 함
-  const double LINEAR_SPEED_FACTOR = 1;
+  /// 실험적으로 구한 비례상수
+  const double LINEAR_SPEED_FACTOR = 1 / 0.054;
   auto wheel_angular_speed = convertRobotAngularVelocityToWheelVelocity(angular_speed_);
 
   left_wheel_msg.data = LINEAR_SPEED_FACTOR * linear_speed_ - wheel_angular_speed;
