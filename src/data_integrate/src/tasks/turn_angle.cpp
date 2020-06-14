@@ -16,7 +16,7 @@ void TurnAngle::doHalt(Blackboard &blackboard)
 
 TaskResult TurnAngle::doTick(Blackboard &blackboard)
 {
-  ROS_ASSERT(MAX_TURN_SPEED >= 0);
+  ROS_ASSERT(max_turn_speed_ >= 0);
   ROS_ASSERT(THRESHOLD >= 0);
 
   if (is_first_tick_)
@@ -39,7 +39,7 @@ TaskResult TurnAngle::doTick(Blackboard &blackboard)
   }
 
   // 알맞은 회전 속도를 계산합니다.
-  auto turn_speed = std::min(angle_difference / blackboard.getTimeUntilNextTick(), MAX_TURN_SPEED);
+  auto turn_speed = std::min(angle_difference / blackboard.getTimeUntilNextTick(), max_turn_speed_);
   if (angle_ < 0)
   {
     turn_speed = -turn_speed;
