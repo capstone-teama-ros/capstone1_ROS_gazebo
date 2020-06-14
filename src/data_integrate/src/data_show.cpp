@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include <ros/package.h>
 #include <ros/ros.h>
@@ -16,6 +17,8 @@
 #include "sensor_msgs/LaserScan.h"
 
 #include "opencv2/opencv.hpp"
+
+#include "line_cluster.h"
 
 float MAP_CX = 200.5;
 float MAP_CY = 200.5;
@@ -148,6 +151,16 @@ void updateHoughTransformParameters(int& threshold, double& rho, double& theta_d
   }
 }
 
+/** Draws a polar line represented by (rho, theta) on the given map. */
+void drawPolarLine(cv::Mat& map, double rho, double theta, const cv::Scalar& color)
+{
+  double a = cos(theta), b = sin(theta);
+  double x0 = a * rho, y0 = b * rho;
+  cv::Point pt1(cvRound(x0 - 1000 * b), cvRound(y0 + 1000 * a));
+  cv::Point pt2(cvRound(x0 + 1000 * b), cvRound(y0 - 1000 * a));
+  cv::line(map, pt1, pt2, color);
+}
+
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "data_show_node");
@@ -218,11 +231,24 @@ int main(int argc, char** argv)
     {
       auto rho = lines[i][0];
       auto theta = lines[i][1];
-      double a = cos(theta), b = sin(theta);
-      double x0 = a * rho, y0 = b * rho;
-      cv::Point pt1(cvRound(x0 - 1000 * b), cvRound(y0 + 1000 * a));
-      cv::Point pt2(cvRound(x0 + 1000 * b), cvRound(y0 - 1000 * a));
-      cv::line(map, pt1, pt2, cv::Scalar(0, 255, 255));
+      drawPolarLine(map, rho, theta, cv::Scalar(0, 255, 255));
+    }
+
+    // Cluster the lines
+    std::vector<PolarLine> polar_lines;
+    for (auto& line_data : lines)
+    {
+      polar_lines.emplace_back(line_data[0], line_data[1]);
+    }
+    using PolarLineCluster = std::vector<PolarLine>;
+    auto clusters = buildLineClusters<std::vector<PolarLineCluster>>(polar_lines, 30, CV_PI * 40 / 180);
+    int cluster_count = 0;
+    for (auto& cluster : clusters)
+    {
+      auto avg_rho = getAverageRho(cluster);
+      auto avg_theta = getAverageTheta(cluster);
+      ROS_INFO("Cluster %d: rho = %f, theta = %f, lines = %lu", ++cluster_count, avg_rho, avg_theta, cluster.size());
+      drawPolarLine(map, avg_rho, avg_theta, cv::Scalar(0, 0, 255));
     }
 
     cv::imshow("Frame", map);
