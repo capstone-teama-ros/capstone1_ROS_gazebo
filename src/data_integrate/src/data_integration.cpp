@@ -39,9 +39,9 @@ int main(int argc, char** argv)
     std_msgs::Float64 FR_position_msg;
     std_msgs::Float64 CS_position_msg;
 
-    FL_position_msg.data = 0.05;
-    FR_position_msg.data = 0.05;
-    CS_position_msg.data = 0.05;
+    FL_position_msg.data = 0.0;
+    FR_position_msg.data = 0.0;
+    CS_position_msg.data = 0.0;
 
     fl_publish.publish(FL_position_msg);
     fr_publish.publish(FR_position_msg);

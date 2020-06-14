@@ -8,26 +8,26 @@ myrobot:
   FLsuspension_position_controller:
     type: effort_controllers/JointPositionController
     joint: suspension_joint1
-    pid: {p: 10000.0, i: 0.0, d: 1000}
+    pid: {p: 842.243, i: 0.0, d: 38.0805}
     
   FRsuspension_position_controller:
     type: effort_controllers/JointPositionController
     joint: suspension_joint2
-    pid: {p: 10000.0, i: 0.0, d: 1000}
+    pid: {p: 842.243, i: 0.0, d: 38.0805}
     
   CSsuspension_position_controller:
     type: effort_controllers/JointPositionController
     joint: suspension_joint3
-    pid: {p: 10000.0, i: 0.0, d: 1000}
+    pid: {p: 1686.717, i: 0.0, d: 10.92}
    
   # Velocity Controllers --------------------------------------- 
   FLwheel_velocity_controller:
     type: effort_controllers/JointVelocityController
     joint: wheel_joint1
-    pid: {p: 100, i: 0.00, d: 0}
+    pid: {p: 100000, i: 0.00, d: 0}
     
   FRwheel_velocity_controller:
     type: effort_controllers/JointVelocityController
     joint: wheel_joint2
-    pid: {p: 100, i: 0.00, d: 0}
+    pid: {p: 100000, i: 0.00, d: 0}
 
