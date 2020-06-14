@@ -218,14 +218,15 @@ void ball_detect()
   int rball_num = 0;
   int gball_num = 0;
 
+  // declare colors. Scalar(blue, green, red)
+  const Scalar COLOR_BLUE(255, 0, 0);
+  const Scalar COLOR_GREEN(0, 255, 0);
+  const Scalar COLOR_RED(0, 0, 255);
+
   for (size_t i = 0; i < contours_b.size(); i++)
   {
     if (radius_b[i] > iMin_tracking_ball_size)
     {
-      // declare colors. Scalar(blue, green, red)
-      Scalar color = Scalar(255, 0, 0);
-      Scalar color_g = Scalar(0, 255, 0);
-
       // find the pixel point of the circle cneter, and the pixel radius of an circle
 
       float px_b = center_b[i].x;
@@ -242,8 +243,8 @@ void ball_detect()
 
       std::string text = pointToString(ball_pos_b);
 
-      putText(result, text, center_b[i], 2, 1, color_g, 2);
-      circle(result, center_b[i], (int)radius_b[i], color, 2, 8, 0);
+      putText(result, text, center_b[i], 2, 1, COLOR_GREEN, 2);
+      circle(result, center_b[i], (int)radius_b[i], COLOR_BLUE, 2, 8, 0);
       bball_num = bball_num + 1;
 
       // push back variables of real ball position to the message variable
@@ -258,9 +259,6 @@ void ball_detect()
   {
     if (radius_r[i] > iMin_tracking_ball_size)
     {
-      Scalar color = Scalar(0, 0, 255);
-      Scalar color_g = Scalar(0, 255, 0);
-
       float px_r = center_r[i].x;
       float py_r = center_r[i].y;
       float pr_r = radius_r[i];
@@ -270,8 +268,8 @@ void ball_detect()
 
       std::string text = pointToString(ball_pos_r);
 
-      putText(result, text, center_r[i], 2, 1, color_g, 2);
-      circle(result, center_r[i], (int)radius_r[i], color, 2, 8, 0);
+      putText(result, text, center_r[i], 2, 1, COLOR_GREEN, 2);
+      circle(result, center_r[i], (int)radius_r[i], COLOR_RED, 2, 8, 0);
       rball_num = rball_num + 1;
       msg1.red_x.push_back(ball_pos_r[0]);
       msg1.red_y.push_back(ball_pos_r[2]);
@@ -282,10 +280,6 @@ void ball_detect()
   {
     if (radius_g[i] > iMin_tracking_ball_size)
     {
-      // declare colors. Scalar(blue, green, red)
-      Scalar color = Scalar(0, 255, 0);
-      Scalar color_g = Scalar(0, 255, 0);
-
       // find the pixel point of the circle cneter, and the pixel radius of an circle
 
       float px_g = center_g[i].x;
@@ -302,8 +296,8 @@ void ball_detect()
 
       std::string text = pointToString(ball_pos_g);
 
-      putText(result, text, center_g[i], 2, 1, color_g, 2);
-      circle(result, center_g[i], (int)radius_g[i], color, 2, 8, 0);
+      putText(result, text, center_g[i], 2, 1, COLOR_GREEN, 2);
+      circle(result, center_g[i], (int)radius_g[i], COLOR_GREEN, 2, 8, 0);
       gball_num = gball_num + 1;
 
       // push back variables of real ball position to the message variable
