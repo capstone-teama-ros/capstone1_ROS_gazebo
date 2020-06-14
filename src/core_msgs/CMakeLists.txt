@@ -13,6 +13,7 @@ add_message_files( DIRECTORY msg
   ball_position.msg
   multiarray.msg
   line_info.msg
+  ball_ch.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -27,3 +28,4 @@ add_message_files( DIRECTORY msg
 ## Generate added messages and services with any dependencies listed here
 generate_messages(DEPENDENCIES std_msgs sensor_msgs)
 catkin_package(CATKIN_DEPENDS message_runtime std_msgs geometry_msgs sensor_msgs)
+
