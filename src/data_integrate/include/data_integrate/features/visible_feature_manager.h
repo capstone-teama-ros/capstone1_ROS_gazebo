@@ -56,6 +56,14 @@ public:
   }
 
   /**
+   * 가장 최근에 LIDAR로 관측한 기둥의 목록을 가져옵니다.
+   */
+  const LidarPointCollection& getColumns() const
+  {
+    return columns_;
+  }
+
+  /**
    * 현재 파란 공이 포획되어 있는지 확인합니다.
    */
   bool isBlueBallCaptured() const
@@ -96,6 +104,7 @@ public:
 private:
   BallCollection balls_;
   LidarPointCollection lidar_points_;
+  LidarPointCollection columns_;
   bool is_blue_ball_captured_ = false;
   ImuVectorT imu_angular_velocity_;     ///< (x축, y축, z축) (rad/s)
   ImuVectorT imu_linear_acceleration_;  ///< (x, y, z) (m/s^2)
