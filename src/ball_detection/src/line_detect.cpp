@@ -114,7 +114,7 @@ void colorthresh(cv::Mat input)
     cv::circle(img_mask, p1, 5, cv::Scalar(155, 200, 0), -1);
   }
   c_x = M.m10 / M.m00;
-  // Tolerance to chooise directions
+  // Tolerance to choose directions
   auto tol = 15;
   auto count = cv::countNonZero(img_mask);
   // Turn left if centroid is to the left of the image center minus tolerance
