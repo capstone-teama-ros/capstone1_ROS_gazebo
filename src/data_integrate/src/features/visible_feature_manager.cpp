@@ -17,7 +17,8 @@ void VisibleFeatureManager::subscribeToLidar(const sensor_msgs::LaserScan::Const
     {
       // LIDAR는 x축을 기준으로 반시계 방향으로 각도를 측정합니다.
       // 저희는 y축을 기준으로 측정할 예정이니 90도를 빼야 합니다.
-      auto angle = msg->angle_min + msg->angle_increment * i - M_PI / 2;
+      // 그런데 180도 뒤집힌 것을 보니 센서가 거꾸로 달려 있는 듯? 그래서 90도를 더하는 것으로 했습니다.
+      auto angle = msg->angle_min + msg->angle_increment * i + M_PI / 2;
       lidar_points_.emplace_back(range, angle);
     }
 
