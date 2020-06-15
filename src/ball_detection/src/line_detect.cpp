@@ -138,8 +138,8 @@ void colorthresh(cv::Mat input)
     msg1.section = 3;
   }
   // Output images viewed by the turtlebot
-  cv::namedWindow("Turtlebot View");
-  imshow("Turtlebot View", input);
+  cv::namedWindow("Robot View");
+  imshow("Robot View", input);
 }
 
 int main(int argc, char** argv)
@@ -165,5 +165,5 @@ int main(int argc, char** argv)
     ros::spinOnce();
   }
   // Closing image viewer
-  cv::destroyWindow("Turtlebot View");
+  cv::destroyWindow("Robot View");
 }
