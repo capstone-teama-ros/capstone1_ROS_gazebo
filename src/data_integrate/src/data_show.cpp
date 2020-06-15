@@ -1,136 +1,73 @@
-#include <math.h>
-#include <signal.h>
-#include <stdio.h>
-#include <algorithm>
-#include <chrono>
-#include <fstream>
-#include <iostream>
-#include <string>
-
-#include <ros/package.h>
+#include <core_msgs/ball_position.h>
 #include <ros/ros.h>
-#include <boost/thread.hpp>
+#include <sensor_msgs/LaserScan.h>
 
-#include "core_msgs/ball_position.h"
-#include "ros/ros.h"
-#include "sensor_msgs/LaserScan.h"
-
-#include "opencv2/opencv.hpp"
-
-float MAP_CX = 200.5;
-float MAP_CY = 200.5;
-float MAP_RESOL = 0.015;  // Map resoultion [cm]
-int MAP_WIDTH = 400;
-int MAP_HEIGHT = 400;
-int MAP_CENTER = 50;
-int OBSTACLE_PADDING = 2;       // Obstacle Size
-int OBSTACLE_CONNECT_MAX = 15;  // Range to connect obstacles
-
-int init_ball;
-int init_lidar;
-
-int lidar_size;
-float lidar_degree[400];
-float lidar_distance[400];
-
-int ball_number;
-float ball_X[20];
-float ball_Y[20];
-
-boost::mutex map_mutex;
-
-#define RAD2DEG(x) ((x)*180. / M_PI)
-
-bool check_point_range(int cx, int cy)
-{
-  return (cx < MAP_WIDTH - 1) && (cx > 0) && (cy < MAP_HEIGHT - 1) && (cy > 0);
-}
-
-void camera_Callback(const core_msgs::ball_position::ConstPtr& position)
-{
-  map_mutex.lock();
-  int count = position->size;
-  ball_number = count;
-  for (int i = 0; i < count; i++)
-  {
-    ball_X[i] = position->img_x[i];
-    ball_Y[i] = position->img_y[i];
-    std::cout << "ball_X : " << ball_X[i];
-    std::cout << "ball_Y : " << ball_Y[i] << std::endl;
-  }
-  map_mutex.unlock();
-}
-void lidar_Callback(const sensor_msgs::LaserScan::ConstPtr& scan)
-{
-  map_mutex.lock();
-  int count = scan->angle_max / scan->angle_increment;
-  lidar_size = count;
-  for (int i = 0; i < count; i++)
-  {
-    lidar_degree[i] = scan->angle_min + scan->angle_increment * i;
-    lidar_distance[i] = scan->ranges[i];
-    // std::cout << "degree : "<< lidar_degree[i];
-    // std::cout << "   distance : "<< lidar_distance[i]<<std::endl;
-  }
-  map_mutex.unlock();
-}
+#include "data_integrate/features/visible_feature_manager.h"
+#include "data_integrate/robot_drawing.h"
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "data_show_node");
-  ros::NodeHandle n;
+  using cv::viz::Color;
 
-  ros::Subscriber sub = n.subscribe<sensor_msgs::LaserScan>("/scan", 1000, lidar_Callback);
-  ros::Subscriber sub1 = n.subscribe<core_msgs::ball_position>("/position", 1000, camera_Callback);
+  ros::init(argc, argv, "data_show_node");
+  ros::NodeHandle n("~");
+
+  VisibleFeatureManager vfm;
+
+  ros::Subscriber lidar_sub =
+      n.subscribe<sensor_msgs::LaserScan>("/scan", 1000, &VisibleFeatureManager::subscribeToLidar, &vfm);
+  ros::Subscriber camera_sub =
+      n.subscribe<core_msgs::ball_position>("/position", 1000, &VisibleFeatureManager::subscribeToCamera, &vfm);
+
+  RobotDrawing image(600, 600, 1 / 0.015);
+  const double LIDAR_POINT_SIZE = image.toMeters(2);
+  const int BALL_RADIUS = 5;
+  const int ROBOT_SIZE = 10;
 
   while (ros::ok())
   {
-    cv::Mat map = cv::Mat::zeros(MAP_WIDTH, MAP_HEIGHT, CV_8UC3);
+    image.clear();
+
     // Drawing Lidar data
-    float obstacle_x, obstacle_y;
-    int cx, cy;
-    int cx1, cx2, cy1, cy2;
-    for (int i = 0; i < lidar_size; i++)
+    for (auto& point : vfm.getLidarPoints())
     {
-      obstacle_x = lidar_distance[i] * cos(lidar_degree[i]);
-      obstacle_y = lidar_distance[i] * sin(lidar_degree[i]);
-      cx = MAP_WIDTH / 2 + (int)(obstacle_y / MAP_RESOL);
-      cy = MAP_HEIGHT / 2 + (int)(obstacle_x / MAP_RESOL);
-      cx1 = cx - OBSTACLE_PADDING;
-      cy1 = cy - OBSTACLE_PADDING;
-      cx2 = cx + OBSTACLE_PADDING;
-      cy2 = cy + OBSTACLE_PADDING;
-
-      if (check_point_range(cx, cy) && check_point_range(cx1, cy1) && check_point_range(cx2, cy2))
-      {
-        cv::line(map, cv::Point(MAP_WIDTH / 2, MAP_HEIGHT / 2), cv::Point(cx, cy), cv::Scalar(63, 63, 0), 1);
-        cv::rectangle(map, cv::Point(cx1, cy1), cv::Point(cx2, cy2), cv::Scalar(255, 255, 0), -1);
-      }
+      auto x = point.getRelX();
+      auto y = point.getRelY();
+      image.line({ 0, 0 }, { x, y }, Color::teal(), 1, cv::LINE_AA);
+      image.rectangle({ x - LIDAR_POINT_SIZE, y - LIDAR_POINT_SIZE }, { x + LIDAR_POINT_SIZE, y + LIDAR_POINT_SIZE },
+                      Color::celestial_blue(), CV_FILLED);
     }
+
     // Drawing ball
-    for (int i = 0; i < ball_number; i++)
+    for (auto& ball : vfm.getBalls())
     {
-      cx = (int)(ball_X[i] / 4);
-      cy = (int)(ball_Y[i] / 4);
-      cx1 = cx - OBSTACLE_PADDING * 2;
-      cy1 = cy - OBSTACLE_PADDING * 2;
-      cx2 = cx + OBSTACLE_PADDING * 2;
-      cy2 = cy + OBSTACLE_PADDING * 2;
-
-      if (check_point_range(cx, cy) && check_point_range(cx1, cy1) && check_point_range(cx2, cy2))
+      auto x = ball.getRelX();
+      auto y = ball.getRelY();
+      Color color;
+      switch (ball.getColor())
       {
-        cv::rectangle(map, cv::Point(cx1, cy1), cv::Point(cx2, cy2), cv::Scalar(0, 0, 255), -1);
+        case BallColor::Blue:
+          color = Color::blue();
+          break;
+        case BallColor::Green:
+          color = Color::green();
+          break;
+        case BallColor::Red:
+          color = Color::red();
+          break;
+        default:
+          ROS_ASSERT_MSG(0, "Unexpected color: %u", static_cast<unsigned int>(ball.getColor()));
       }
+      image.circle({ x, y }, BALL_RADIUS, color, CV_FILLED, cv::LINE_AA);
     }
+
     // Drawing ROBOT
-    cv::circle(map, cv::Point(MAP_WIDTH / 2, MAP_HEIGHT / 2), 3, cv::Scalar(255, 0, 0), -1);
+    image.drawMarker({ 0, 0 }, Color::yellow(), cv::MARKER_STAR, ROBOT_SIZE);
 
-    cv::imshow("Frame", map);
-    cv::waitKey(50);
-
-    if (cv::waitKey(50) == 113)
-    {  // wait for a key command. if 'q' is pressed, then program will be terminated.
-      return 0;
+    // wait for a key command. if 'q' is pressed, then program will be terminated.
+    if (image.drawAndWaitKey("Frame", 50) == 113)
+    {
+      break;
     }
     ros::spinOnce();
   }
