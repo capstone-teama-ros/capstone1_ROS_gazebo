@@ -61,6 +61,12 @@ int main(int argc, char** argv)
       image.circle({ x, y }, BALL_RADIUS, color, CV_FILLED, cv::LINE_AA);
     }
 
+    // Drawing columns
+    for (auto& column : vfm.getColumns())
+    {
+      image.drawMarker({ column.getRelX(), column.getRelY() }, Color::yellow(), cv::MARKER_STAR, 6);
+    }
+
     // Drawing ROBOT
     image.drawMarker({ 0, 0 }, Color::yellow(), cv::MARKER_STAR, ROBOT_SIZE);
 
