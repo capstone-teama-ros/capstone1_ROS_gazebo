@@ -136,6 +136,19 @@ target_link_libraries(test_fixed_distance_driver_node
   ${catkin_LIBRARIES}
 )
 
+add_executable(test_image_node
+  src/test_image_node.cpp
+  src/robot_drawing.cpp
+)
+add_dependencies(test_image_node
+  ${catkin_EXPORTED_TARGETS}
+)
+target_link_libraries(test_image_node
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBS}
+  ${cv_bridge_LIBRARIES}
+)
+
 add_executable(test_visible_feature_manager_node
   src/test_visible_feature_manager_node.cpp
 )
