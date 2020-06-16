@@ -15,9 +15,11 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "test_fixed_distance_driver");
   ros::NodeHandle n("~");
 
-  ros::Publisher left_wheel = n.advertise<std_msgs::Float64>("left_wheel", 10);
-  ros::Publisher right_wheel = n.advertise<std_msgs::Float64>("right_wheel", 10);
-  SimpleWheelController wheel_controller(left_wheel, right_wheel);
+  ros::Publisher lf_wheel = n.advertise<std_msgs::Float64>("lf_wheel", 10);
+  ros::Publisher rf_wheel = n.advertise<std_msgs::Float64>("rf_wheel", 10);
+  ros::Publisher lb_wheel = n.advertise<std_msgs::Float64>("lb_wheel", 10);
+  ros::Publisher rb_wheel = n.advertise<std_msgs::Float64>("rb_wheel", 10);
+  SimpleWheelController wheel_controller(lf_wheel, rf_wheel, lb_wheel, rb_wheel);
 
   ros::Duration publish_interval(0.025);  // seconds
 
@@ -26,8 +28,8 @@ int main(int argc, char** argv)
   const double DISTANCE_THRESHOLD = 0.01;  // meters
   FixedDistanceDriver driver(MAX_SPEED, MIN_SPEED, DISTANCE_THRESHOLD);
 
-  ROS_INFO("FixedDistanceDriver test node is publishing on:\n  %s\n  %s", left_wheel.getTopic().c_str(),
-           right_wheel.getTopic().c_str());
+  ROS_INFO("FixedDistanceDriver test node is publishing on:\n  %s\n  %s\n  %s\n  %s", lf_wheel.getTopic().c_str(),
+           rf_wheel.getTopic().c_str(), lb_wheel.getTopic().c_str(), rb_wheel.getTopic().c_str());
 
   double target_distance = 0;
   double targetChangeTimer = 0;

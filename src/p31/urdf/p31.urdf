@@ -102,11 +102,10 @@
     </visual>
     <collision>
       <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
+        xyz="0 0.015 0"
+        rpy="-1.5707 0 0" />
       <geometry>
-        <mesh
-          filename="package://p31/meshes/wheel1.STL" />
+        <cylinder radius="${0.149/2}" length="0.03"/>
       </geometry>
     </collision>
   </link>
@@ -216,11 +215,10 @@
     </visual>
     <collision>
       <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
+        xyz="0 0.015 0"
+        rpy="-1.5707 0 0" />
       <geometry>
-        <mesh
-          filename="package://p31/meshes/wheel2.STL" />
+        <cylinder radius="${0.149/2}" length="0.03"/>
       </geometry>
     </collision>
   </link>
@@ -240,21 +238,100 @@
       effort="3.1"
       velocity="7" />
   </joint>
+  <link name="suspension3">
+    <inertial>
+      <origin xyz="-0.000780007183144651 0.0205097222143209 -0.0068599226721715" rpy="0 0 0" />
+      <mass value="0.102867975835406" />
+      <inertia
+        ixx="3.45505642878179E-05"  ixy="1.5645477317528E-07"  ixz="2.96411876510939E-09"
+        iyy="5.04392109779442E-05"  iyz="1.64845302056396E-08"
+        izz="4.20892495598477E-05" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh  filename="package://p31/meshes/suspension1.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://p31/meshes/suspension1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="suspension_joint3" type="prismatic">
+    <origin  xyz="0.135 ${-0.09+0.18} 0.080496"  rpy="-3.1416 0 1.5708" />
+    <parent link="base_link" />
+    <child link="suspension3" />
+    <axis xyz="0 0 1" />
+    <limit  lower="-0.05" upper="0.05" effort="10000" velocity="100000" />
+  </joint>
+  
+  <link name="wheel3">
+    <inertial>
+      <origin xyz="-7.494E-16 0.0081775 1.5266E-16" rpy="0 0 0" />
+      <mass value="0.23655" />
+      <inertia  ixx="0.00039661" ixy="3.2785E-19" ixz="4.0658E-20"
+					iyy="0.00076902"  iyz="-7.0588E-20"
+					izz="0.00039661" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://p31/meshes/wheel1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0.50196 1 0.32" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0.015 0"
+        rpy="-1.5707 0 0" />
+      <geometry>
+        <cylinder radius="${0.149/2}" length="0.03"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="wheel_joint3"
+    type="continuous">
+    <origin
+      xyz="-0.0133 0.043 0.00020079"
+      rpy="0 0.5236 0" />
+    <parent
+      link="suspension3" />
+    <child
+      link="wheel3" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      effort="3.1"
+      velocity="7" />
+  </joint>
   <link
-    name="suspension3">
+    name="suspension4">
     <inertial>
       <origin
-        xyz="-1.02730324247346E-13 0.015 -1.0547118733939E-15"
+        xyz="-0.000780007183144901 -0.0205097222143207 -0.00699762293412363"
         rpy="0 0 0" />
       <mass
-        value="0.00235619449019234" />
+        value="0.102867975835406" />
       <inertia
-        ixx="1.91440802328128E-07"
-        ixy="-3.41495302512105E-40"
-        ixz="0"
-        iyy="2.94524311274043E-08"
-        iyz="3.0603630879953E-40"
-        izz="1.91440802328128E-07" />
+        ixx="3.45505642878179E-05"
+        ixy="-1.56454773175154E-07"
+        ixz="-2.96411876511686E-09"
+        iyy="5.04392109779442E-05"
+        iyz="1.64845302058301E-08"
+        izz="4.20892495598477E-05" />
     </inertial>
     <visual>
       <origin
@@ -262,12 +339,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://p31/meshes/suspension3.STL" />
+          filename="package://p31/meshes/suspension2.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
@@ -276,22 +353,22 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://p31/meshes/suspension3.STL" />
+          filename="package://p31/meshes/suspension2.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="suspension_joint3"
+    name="suspension_joint4"
     type="prismatic">
     <origin
-      xyz="0 0.175 0.069998"
-      rpy="1.5708 0 0" />
+      xyz="-0.135 ${-0.09+0.18} 0.080496"
+      rpy="3.1416 0 1.5708" />
     <parent
       link="base_link" />
     <child
-      link="suspension3" />
+      link="suspension4" />
     <axis
-      xyz="0 -1 0" />
+      xyz="0 0 1" />
     <limit
       lower="-0.05"
       upper="0.05"
@@ -299,20 +376,20 @@
       velocity="100000" />
   </joint>
   <link
-    name="wheel3">
+    name="wheel4">
     <inertial>
       <origin
-        xyz="-9.9925E-14 -2.3807E-14 1.3323E-15"
+        xyz="9.992E-16 0.0081775 -8.0491E-16"
         rpy="0 0 0" />
       <mass
-        value="0.14667" />
+        value="0.23655" />
       <inertia
-        ixx="6.1968E-05"
-        ixy="2.422E-21"
-        ixz="0"
-        iyy="6.1968E-05"
-        iyz="4.2352E-22"
-        izz="6.1968E-05" />
+        ixx="0.00039661"
+        ixy="2.5118E-19"
+        ixz="1.4954E-23"
+        iyy="0.00076902"
+        iyz="3.8054E-20"
+        izz="0.00039661" />
     </inertial>
     <visual>
       <origin
@@ -320,36 +397,38 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://p31/meshes/wheel3.STL" />
+          filename="package://p31/meshes/wheel2.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="1 1 1 1" />
+          rgba="0 0.50196 1 0.32" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
+        xyz="0 0.015 0"
+        rpy="-1.5707 0 0" />
       <geometry>
-        <mesh
-          filename="package://p31/meshes/wheel3.STL" />
+        <cylinder radius="${0.149/2}" length="0.03"/>
       </geometry>
     </collision>
   </link>
   <joint
-    name="wheel_joint3"
-    type="fixed">
+    name="wheel_joint4"
+    type="continuous">
     <origin
-      xyz="0 -0.032113 0"
-      rpy="-0.036641 -0.028589 -0.23329" />
+      xyz="-0.0133 -0.043 ${-0.00020079-0.00041}"
+      rpy="3.1416 1.5708 0" />
     <parent
-      link="suspension3" />
+      link="suspension4" />
     <child
-      link="wheel3" />
+      link="wheel4" />
     <axis
-      xyz="0.028585 -0.036618 0.99892" />
+      xyz="0 -1 0" />
+    <limit
+      effort="3.1"
+      velocity="7" />
   </joint>
   <link
     name="second">
@@ -415,7 +494,7 @@
   </link>
   
   <joint name="lidar_joint" type="fixed">
-	<origin xyz="-0.00053 -0.10606 ${0.25173+0.03}" rpy="0 0 0"/>\
+	<origin xyz="-0.00053 -0.10606 ${0.25173+0.03}" rpy="0 0 3.141592"/>
 	<parent link="base_link"/>
 	<child link="lidar"/>
   </joint>
@@ -553,6 +632,16 @@
 			<mechanicalReduction>1</mechanicalReduction>
 		</actuator>
 	</transmission>
+	<transmission name="4_suspension_act">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="suspension_joint4">
+			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="linear4">
+			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
 	
 	
   <transmission name="1_wheel_act">
@@ -572,6 +661,26 @@
 			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
 		</joint>
 		<actuator name="rotate2">
+			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+	<transmission name="3_wheel_act">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="wheel_joint3">
+			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="rotate3">
+			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+	<transmission name="4_wheel_act">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="wheel_joint4">
+			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="rotate4">
 			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
 			<mechanicalReduction>1</mechanicalReduction>
 		</actuator>

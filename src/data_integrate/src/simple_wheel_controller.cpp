@@ -7,8 +7,9 @@
 #include <iterator>
 #include <utility>
 
-SimpleWheelController::SimpleWheelController(const ros::Publisher& left_wheel, const ros::Publisher& right_wheel)
-  : left_wheel_(left_wheel), right_wheel_(right_wheel)
+SimpleWheelController::SimpleWheelController(const ros::Publisher& lf_wheel, const ros::Publisher& rf_wheel,
+                                             const ros::Publisher& lb_wheel, const ros::Publisher& rb_wheel)
+  : lf_wheel_(lf_wheel), lb_wheel_(lb_wheel), rf_wheel_(rf_wheel), rb_wheel_(rb_wheel)
 {
 }
 
@@ -42,8 +43,10 @@ void SimpleWheelController::publish() const
   left_wheel_msg.data = LINEAR_SPEED_FACTOR * linear_speed_ - wheel_angular_speed;
   right_wheel_msg.data = LINEAR_SPEED_FACTOR * linear_speed_ + wheel_angular_speed;
 
-  left_wheel_.publish(left_wheel_msg);
-  right_wheel_.publish(right_wheel_msg);
+  lf_wheel_.publish(left_wheel_msg);
+  rf_wheel_.publish(right_wheel_msg);
+  lb_wheel_.publish(left_wheel_msg);
+  rb_wheel_.publish(right_wheel_msg);
 }
 
 using InterPoint = std::pair<double, double>;

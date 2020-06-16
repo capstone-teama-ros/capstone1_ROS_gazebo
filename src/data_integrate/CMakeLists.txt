@@ -101,6 +101,21 @@ target_link_libraries(data_show_node
   ${PROJECT_NAME}_features_lib
 )
 
+add_executable(model_test_node
+  src/data_integration.cpp
+  src/blackboard.cpp
+  src/simple_wheel_controller.cpp
+  src/task_executor.cpp
+)
+add_dependencies(model_test_node core_msgs_generate_messages_cpp)
+target_link_libraries(model_test_node
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBS}
+  ${cv_bridge_LIBRARIES}
+  ${PROJECT_NAME}_features_lib
+  ${PROJECT_NAME}_tasks_lib
+)
+
 add_executable(test_simple_wheel_controller_node
   src/test_simple_wheel_controller_node.cpp
   src/simple_wheel_controller.cpp

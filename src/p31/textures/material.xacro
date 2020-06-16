@@ -39,6 +39,15 @@
 				</material>
 		</visual>
 	</gazebo>
+	<gazebo reference="suspension4">
+		<visual>
+				<material>
+					<ambient>${255/255} ${187/255} ${0/255} 1</ambient>
+					<diffuse>${255/255} ${187/255} ${0/255} 1</diffuse>
+					<specular>${255/255} ${187/255} ${0/255} 1</specular>
+				</material>
+		</visual>
+	</gazebo>
 	
 	<gazebo reference="wheel1">
 		<visual>
@@ -48,13 +57,13 @@
 					<specular>${5/255} ${0/255} ${153/255} 0.5</specular>
 				</material>
 		</visual>
-		<mu1>20.0</mu1>
-		<mu2>40.0</mu2>
+		<mu1>1</mu1>
+		<mu2>1.0</mu2>
 		<kp>500000.0</kp>
 		<kd>10.0</kd>
 		<minDepth>0.001</minDepth>
 		<maxVel>0.1</maxVel>
-		<fdir1>1 0 0</fdir1>
+		<fdir1>0 1 0</fdir1>
 	</gazebo>
 	<gazebo reference="wheel2">
 		<visual>
@@ -64,13 +73,13 @@
 					<specular>${5/255} ${0/255} ${153/255} 0.5</specular>
 				</material>
 		</visual>
-		<mu1>20.0</mu1>
-		<mu2>40.0</mu2>
+		<mu1>1.0</mu1>
+		<mu2>1.0</mu2>
 		<kp>500000.0</kp>
 		<kd>10.0</kd>
 		<minDepth>0.001</minDepth>
 		<maxVel>0.1</maxVel>
-		<fdir1>1 0 0</fdir1>
+		<fdir1>0 1 0</fdir1>
 	</gazebo>
 	<gazebo reference="wheel3">
 		<visual>
@@ -80,8 +89,24 @@
 					<specular>${5/255} ${0/255} ${153/255} 0.5</specular>
 				</material>
 		</visual>
-		<mu1>0.01</mu1>
-		<mu2>0.01</mu2>
+		<mu1>1</mu1>
+		<mu2>1</mu2>
+		<kp>500000.0</kp>
+		<kd>10.0</kd>
+		<minDepth>0.001</minDepth>
+		<maxVel>0.1</maxVel>
+		<fdir1>1 0 0</fdir1>
+	</gazebo>
+	<gazebo reference="wheel4">
+		<visual>
+				<material>
+					<ambient>${5/255} ${0/255} ${153/255} 0.5</ambient>
+					<diffuse>${5/255} ${0/255} ${153/255} 0.5</diffuse>
+					<specular>${5/255} ${0/255} ${153/255} 0.5</specular>
+				</material>
+		</visual>
+		<mu1>1</mu1>
+		<mu2>1</mu2>
 		<kp>500000.0</kp>
 		<kd>10.0</kd>
 		<minDepth>0.001</minDepth>
