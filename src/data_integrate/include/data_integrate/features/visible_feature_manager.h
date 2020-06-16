@@ -105,14 +105,6 @@ public:
   }
 
   /**
-   * @returns 라인트레이서: 카메라에 검은 선이 보이는지 여부
-   */
-  bool getTracerHasLine() const
-  {
-    return line_tracer_has_line_;
-  }
-
-  /**
    * @returns 라인트레이서: 검은 줄이 속한 구간 번호 (line_detect.cpp 참고)
    */
   int getTracerSection() const
@@ -180,7 +172,6 @@ private:
   bool is_blue_ball_captured_ = false;
   ImuVectorT imu_angular_velocity_;     ///< (x축, y축, z축) (rad/s)
   ImuVectorT imu_linear_acceleration_;  ///< (x, y, z) (m/s^2)
-  bool line_tracer_has_line_ = false;
   int line_tracer_section_;
   int line_tracer_box_x_;
   int line_tracer_box_y_;
