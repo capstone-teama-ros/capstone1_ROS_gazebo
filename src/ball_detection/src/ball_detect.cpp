@@ -8,6 +8,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/viz.hpp>
 
 // Setting Thresholds for red and blue part of image.
 // Changable to fit your enviroment. If you want to use bgr, it should be different.
@@ -89,7 +90,6 @@ void extractBall(cv::Mat& hsv_frame, int low_threshold, int ratio, int kernel_si
     cv::minEnclosingCircle(contours_poly[i], centers->at(i), radii->at(i));
   }
 }
-
 // Declaration of functions that calculates the ball position from pixel position.
 std::vector<float> pixel2point(cv::Point center, int radius)
 {
@@ -109,6 +109,47 @@ std::vector<float> pixel2point(cv::Point center, int radius)
   position.push_back(Yc);
   position.push_back(Zc);
   return position;
+}
+
+void addBallData(decltype(core_msgs::ball_position::red_x)* ball_x, decltype(core_msgs::ball_position::red_y)* ball_y,
+                 const std::vector<cv::Vec4i>& hierarchy, const std::vector<std::vector<cv::Point> >& contours,
+                 const std::vector<cv::Point2f>& centers, const std::vector<float>& radii, const cv::Scalar& ball_color)
+{
+  for (size_t i = 0; i < contours.size(); i++)
+  {
+    if (hierarchy[i][3] == -1 && radii[i] > iMin_tracking_ball_size)
+    {
+      // find the pixel point of the circle cneter, and the pixel radius of an circle
+
+      float px = centers[i].x;
+      float py = centers[i].y;
+      float pr = radii[i];
+
+      // change the pixel value to real world value
+
+      std::vector<float> ball_pos = pixel2point(centers[i], radii[i]);
+
+      // draw the circle at the result cv::Mat matrix
+      // putText puts text at the matrix, puts text, at the point of an image
+
+      float isx = ball_pos[0];
+      float isy = ball_pos[1];
+      float isz = ball_pos[2];
+
+      std::string sx = std::to_string(isx);
+      std::string sy = std::to_string(isy);
+      std::string sz = std::to_string(isz);
+
+      std::string text = "x: " + sx + ", y: " + sy + ", z: " + sz;
+      cv::Scalar text_color = cv::Scalar(0, 255, 0);  // (blue, green, red)
+      putText(result, text, centers[i], 2, 1, text_color, 2);
+      circle(result, centers[i], static_cast<int>(radii[i]), ball_color, 2, 8, 0);
+
+      // push back variables of real ball position to the message variable
+      ball_x->push_back(ball_pos[0]);
+      ball_y->push_back(ball_pos[2]);
+    }
+  }
 }
 
 void ball_detect()
@@ -163,157 +204,31 @@ void ball_detect()
 
   // Declare message variable to publish
   core_msgs::ball_position msg;
-  int bball_num = 0;
-  int rball_num = 0;
-  int gball_num = 0;
 
-  for (size_t i = 0; i < contours_b.size(); i++)
-  {
-    if (hierarchy_b[i][3] == -1)
-    {
-      if (radius_b[i] > iMin_tracking_ball_size)
-      {
-        // declare colors. cv::Scalar(blue, green, red)
-        cv::Scalar color = cv::Scalar(255, 0, 0);
-        cv::Scalar color_g = cv::Scalar(0, 255, 0);
+  addBallData(&msg.blue_x, &msg.blue_y, hierarchy_b, contours_b, center_b, radius_b, cv::viz::Color::blue());
+  addBallData(&msg.red_x, &msg.red_y, hierarchy_r, contours_r, center_r, radius_r, cv::viz::Color::red());
+  addBallData(&msg.green_x, &msg.green_y, hierarchy_g, contours_g, center_g, radius_g, cv::viz::Color::green());
 
-        // find the pixel point of the circle cneter, and the pixel radius of an circle
-
-        float px_b = center_b[i].x;
-        float py_b = center_b[i].y;
-        float pr_b = radius_b[i];
-
-        // change the pixel value to real world value
-
-        std::vector<float> ball_pos_b;
-        ball_pos_b = pixel2point(center_b[i], radius_b[i]);
-
-        // draw the circle at the result cv::Mat matrix
-        // putText puts text at the matrix, puts text, at the point of an image
-
-        float isx = ball_pos_b[0];
-        float isy = ball_pos_b[1];
-        float isz = ball_pos_b[2];
-
-        std::string sx = std::to_string(isx);
-        std::string sy = std::to_string(isy);
-        std::string sz = std::to_string(isz);
-
-        std::string text;
-        text = "x: " + sx + ", y: " + sy + ", z: " + sz;
-        putText(result, text, center_b[i], 2, 1, color_g, 2);
-        circle(result, center_b[i], (int)radius_b[i], color, 2, 8, 0);
-        bball_num = bball_num + 1;
-
-        // push back variables of real ball position to the message variable
-        msg.blue_x.push_back(ball_pos_b[0]);
-        msg.blue_y.push_back(ball_pos_b[2]);
-      }
-    }
-  }
-
-  // do same procedure for red balls
-
-  for (size_t i = 0; i < contours_r.size(); i++)
-  {
-    if (hierarchy_r[i][3] == -1)
-    {
-      if (radius_r[i] > iMin_tracking_ball_size)
-      {
-        cv::Scalar color = cv::Scalar(0, 0, 255);
-        cv::Scalar color_g = cv::Scalar(0, 255, 0);
-
-        float px_r = center_r[i].x;
-        float py_r = center_r[i].y;
-        float pr_r = radius_r[i];
-
-        std::vector<float> ball_pos_r;
-        ball_pos_r = pixel2point(center_r[i], radius_r[i]);
-
-        float isx = ball_pos_r[0];
-        float isy = ball_pos_r[1];
-        float isz = ball_pos_r[2];
-
-        std::string sx = std::to_string(isx);
-        std::string sy = std::to_string(isy);
-        std::string sz = std::to_string(isz);
-
-        std::string text;
-        text = "x: " + sx + ", y: " + sy + ", z: " + sz;
-        putText(result, text, center_r[i], 2, 1, color_g, 2);
-        circle(result, center_r[i], (int)radius_r[i], color, 2, 8, 0);
-        rball_num = rball_num + 1;
-        msg.red_x.push_back(ball_pos_r[0]);
-        msg.red_y.push_back(ball_pos_r[2]);
-      }
-    }
-  }
-
-  for (size_t i = 0; i < contours_g.size(); i++)
-  {
-    if (hierarchy_g[i][3] == -1)
-    {
-      if (radius_g[i] > iMin_tracking_ball_size)
-      {
-        // declare colors. cv::Scalar(blue, green, red)
-        cv::Scalar color = cv::Scalar(0, 255, 0);
-        cv::Scalar color_g = cv::Scalar(0, 255, 0);
-
-        // find the pixel point of the circle cneter, and the pixel radius of an circle
-
-        float px_g = center_g[i].x;
-        float py_g = center_g[i].y;
-        float pr_g = radius_g[i];
-
-        // change the pixel value to real world value
-
-        std::vector<float> ball_pos_g;
-        ball_pos_g = pixel2point(center_g[i], radius_g[i]);
-
-        // draw the circle at the result cv::Mat matrix
-        // putText puts text at the matrix, puts text, at the point of an image
-
-        float isx = ball_pos_g[0];
-        float isy = ball_pos_g[1];
-        float isz = ball_pos_g[2];
-
-        std::string sx = std::to_string(isx);
-        std::string sy = std::to_string(isy);
-        std::string sz = std::to_string(isz);
-
-        std::string text;
-        text = "x: " + sx + ", y: " + sy + ", z: " + sz;
-        cv::putText(result, text, center_g[i], 2, 1, color_g, 2);
-        cv::circle(result, center_g[i], (int)radius_g[i], color, 2, 8, 0);
-        gball_num = gball_num + 1;
-
-        // push back variables of real ball position to the message variable
-        msg.green_x.push_back(ball_pos_g[0]);
-        msg.green_y.push_back(ball_pos_g[2]);
-      }
-    }
-  }
-
-  msg.blue_num = bball_num;
-  msg.red_num = rball_num;
-  msg.green_num = gball_num;
+  msg.blue_num = msg.blue_x.size();
+  msg.red_num = msg.red_x.size();
+  msg.green_num = msg.green_x.size();
   // show what is published at the terminal
   std::cout << msg.blue_num << std::endl;
-  for (int i = 0; i < bball_num; i++)
+  for (int i = 0; i < msg.blue_x.size(); i++)
   {
     std::cout << msg.blue_x[i] << std::endl;
     std::cout << msg.blue_y[i] << std::endl;
   }
 
   std::cout << msg.red_num << std::endl;
-  for (int i = 0; i < rball_num; i++)
+  for (int i = 0; i < msg.red_x.size(); i++)
   {
     std::cout << msg.red_x[i] << std::endl;
     std::cout << msg.red_y[i] << std::endl;
   }
 
   std::cout << msg.green_num << std::endl;
-  for (int i = 0; i < gball_num; i++)
+  for (int i = 0; i < msg.green_x.size(); i++)
   {
     std::cout << msg.green_x[i] << std::endl;
     std::cout << msg.green_y[i] << std::endl;
