@@ -22,7 +22,7 @@ const cv::Scalar HSV_THRESHOLD_BLUE_HIGH(121, 255, 255);
 const cv::Scalar HSV_THRESHOLD_GREEN_LOW(50, 126, 60);
 const cv::Scalar HSV_THRESHOLD_GREEN_HIGH(70, 255, 255);
 
-int low_b_b = 150, high_g_b = 50, high_r_b = 50;
+const int low_b_b = 150, high_g_b = 50, high_r_b = 50;
 
 // Initialization of variable for camera calibration paramters.
 // You should change this if you changed the size of the image.
@@ -31,9 +31,9 @@ float intrinsic_data[9] = { 1206.8897719532354, 0.0, 960.5, 0.0, 1206.8897719532
 float distortion_data[5] = { 0, 0, 0, 0, 0 };
 
 // Minimum ball radius size by pixels. If ball is smaller than this, it won't be searched.
-int iMin_tracking_ball_size = 5;
+const int iMin_tracking_ball_size = 5;
 // Initialization of variable for dimension of the target(real ball diameter by meter)
-float fball_diameter = 0.14;
+const float fball_diameter = 0.14;
 
 // Setting cv::Mat variables for images.
 cv::Mat buffer;
