@@ -11,10 +11,13 @@ class SimpleWheelController
 {
 public:
   /**
-   * @param left_wheel 왼쪽 바퀴에 메시지를 전달할 publisher
-   * @param right_wheel 오른쪽 바퀴에 메시지를 전달할 publisher
+   * @param lf_wheel 왼쪽 앞바퀴에 메시지를 전달할 publisher
+   * @param rf_wheel 오른쪽 앞바퀴에 메시지를 전달할 publisher
+   * @param lb_wheel 왼쪽 뒷바퀴에 메시지를 전달할 publisher
+   * @param rb_wheel 오른쪽 뒷바퀴에 메시지를 전달할 publisher
    */
-  SimpleWheelController(const ros::Publisher &left_wheel, const ros::Publisher &right_wheel);
+  SimpleWheelController(const ros::Publisher& lf_wheel, const ros::Publisher& rf_wheel, const ros::Publisher& lb_wheel,
+                        const ros::Publisher& rb_wheel);
 
   /**
    * 일정한 속도로 선운동을 합니다. 회전은 하지 않습니다.
@@ -72,8 +75,10 @@ public:
 private:
   double linear_speed_ = 0;
   double angular_speed_ = 0;
-  const ros::Publisher &left_wheel_;
-  const ros::Publisher &right_wheel_;
+  const ros::Publisher& lf_wheel_;
+  const ros::Publisher& rf_wheel_;
+  const ros::Publisher& lb_wheel_;
+  const ros::Publisher& rb_wheel_;
 };
 
 #endif  // DATA_INTEGRATE_SIMPLE_WHEEL_CONTROLLER_H
