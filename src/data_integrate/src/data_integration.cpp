@@ -24,7 +24,7 @@ int main(int argc, char** argv)
   ros::Subscriber sub_ball_harvest = n.subscribe<core_msgs::ball_position>(
       "/position", 1000, &VisibleFeatureManager::subscribeToCamera, &visible_features);
   ros::Subscriber sub_line_tracing = n.subscribe<core_msgs::line_info>(
-      "/line_info", 1000, &VisibleFeatureManager::subscribeToLineInfo, &visible_features);
+      "/line_section", 1000, &VisibleFeatureManager::subscribeToLineInfo, &visible_features);
   ros::Subscriber sub_imu =
       n.subscribe<sensor_msgs::Imu>("/imu", 1000, &VisibleFeatureManager::subscribeToImu, &visible_features);
 

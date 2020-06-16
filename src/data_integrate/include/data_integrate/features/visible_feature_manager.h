@@ -149,7 +149,7 @@ public:
    */
   int getTracerImageWidth() const
   {
-    return line_tracer_box_width_;
+    return line_tracer_image_width_;
   }
 
   /**
@@ -157,7 +157,7 @@ public:
    */
   int getTracerImageHeight() const
   {
-    return line_tracer_box_height_;
+    return line_tracer_image_height_;
   }
 
   /**

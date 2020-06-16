@@ -10,9 +10,6 @@ void LineTracer::doHalt(Blackboard &blackboard)
 
 TaskResult LineTracer::doTick(Blackboard &blackboard)
 {
-  double linear_speed = 0;
-  double angular_speed = 0;
-
   blackboard.useSimpleWheelController = false;
 
   auto &vfm = blackboard.visible_features_;
@@ -37,27 +34,36 @@ TaskResult LineTracer::doTick(Blackboard &blackboard)
   }
 
   // 속도 파라미터
-  const double LINEAR_SPEED = 0.35;
-  const double ANGULAR_SPEED_BONUS = 0.2;
+  double linear_speed;
+  double linear_speed_slow;
+  double angular_speed_bonus;
+  ros::param::param<double>("~linear_speed", linear_speed, 0);
+  ros::param::param<double>("~linear_speed_slow", linear_speed_slow, 0);
+  ros::param::param<double>("~angular_speed_bonus", angular_speed_bonus, 0);
+  linear_speed /= 0.063;
+  linear_speed_slow /= 0.063;
+  angular_speed_bonus /= 0.063;
 
   switch (line_position_)
   {
     case LinePosition::Center:
-      direct_controller.setWheelSpeeds(LINEAR_SPEED, LINEAR_SPEED);
+      direct_controller.setWheelSpeeds(linear_speed, linear_speed);
       ROS_INFO("Center (midpoint_relative = %.3f)", midpoint_relative);
       break;
     case LinePosition::Left:
-      direct_controller.setWheelSpeeds(LINEAR_SPEED - ANGULAR_SPEED_BONUS, LINEAR_SPEED + ANGULAR_SPEED_BONUS);
+      direct_controller.setWheelSpeeds(linear_speed_slow - angular_speed_bonus,
+                                       linear_speed_slow + angular_speed_bonus);
       ROS_INFO("Left (midpoint_relative = %.3f)", midpoint_relative);
       break;
     case LinePosition::Right:
-      direct_controller.setWheelSpeeds(LINEAR_SPEED + ANGULAR_SPEED_BONUS, LINEAR_SPEED - ANGULAR_SPEED_BONUS);
+      direct_controller.setWheelSpeeds(linear_speed_slow + angular_speed_bonus,
+                                       linear_speed_slow - angular_speed_bonus);
       ROS_INFO("Right (midpoint_relative = %.3f)", midpoint_relative);
       break;
     case LinePosition::None:
       // 로봇이 검은 줄을 놓쳤다.
       ROS_WARN("No line found!");
-      direct_controller.setWheelSpeeds(LINEAR_SPEED, LINEAR_SPEED);
+      direct_controller.setWheelSpeeds(linear_speed, linear_speed);
       break;
     default:
       ROS_ASSERT_MSG(0, "Unexpected line position: %u", static_cast<unsigned int>(line_position_));
