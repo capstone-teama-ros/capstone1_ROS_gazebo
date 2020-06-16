@@ -38,7 +38,7 @@ void colorthresh(cv::Mat input)
   cv::Scalar upper_black(30, 30, 30);
   cv::Mat img_mask;
   cv::inRange(input, lower_black, upper_black, img_mask);
-  img_mask(cv::Rect(0, 0, w, 0.8 * h)) = 0;
+  img_mask(cv::Rect(0, 0.2 * h, w, h - 0.2 * h)) = 0;
   // Find contours for better visualization
   cv::findContours(img_mask, v, CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
   // If contours exist add a bounding
