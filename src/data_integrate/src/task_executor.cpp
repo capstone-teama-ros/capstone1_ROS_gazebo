@@ -30,7 +30,14 @@ void TaskExecutor::runTaskInLoop(double time_passed_after_last, double time_unti
   // TODO: 여러 task/node가 동시에 바퀴 컨트롤러를 조작하지 못하게 방지하는 장치가 필요하다.
 
   // 바퀴 컨트롤러를 통해 메시지를 전파합니다.
-  blackboard_.wheel_controller_.publish();
+  if (blackboard_.useSimpleWheelController)
+  {
+    blackboard_.wheel_controller_.publish();
+  }
+  else
+  {
+    blackboard_.direct_controller_.publish();
+  }
 }
 
 void TaskExecutor::overrideTask(Task::TaskPtr task)

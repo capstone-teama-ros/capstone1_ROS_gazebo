@@ -6,6 +6,7 @@
 #include <std_msgs/Float64.h>
 
 #include "data_integrate/blackboard.h"
+#include "data_integrate/direct_wheel_controller.h"
 #include "data_integrate/features/visible_feature_manager.h"
 #include "data_integrate/simple_wheel_controller.h"
 #include "data_integrate/task_executor.h"
@@ -37,7 +38,8 @@ int main(int argc, char** argv)
   ros::Publisher br_publish = n.advertise<std_msgs::Float64>("/myrobot/BRsuspension_position_controller/command", 10);
 
   SimpleWheelController wheel_controller(fl_wheel, fr_wheel, bl_wheel, br_wheel);
-  Blackboard blackboard(visible_features, wheel_controller);
+  DirectWheelController direct_controller(fl_wheel, fr_wheel, bl_wheel, br_wheel);
+  Blackboard blackboard(visible_features, wheel_controller, direct_controller);
   TaskExecutor task_executor(blackboard);
 
   ros::Duration sleep_duration(0.025);
