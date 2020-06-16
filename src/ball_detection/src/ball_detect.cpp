@@ -1,22 +1,13 @@
-
+#include <core_msgs/ball_ch.h>
+#include <core_msgs/ball_position.h>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
-#include <math.h>
 #include <ros/ros.h>
 #include <std_msgs/ColorRGBA.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <visualization_msgs/Marker.h>
-#include <algorithm>
-#include <iostream>
-#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
-#include <opencv2/opencv_modules.hpp>
-#include <string>
-#include "core_msgs/ball_ch.h"
-#include "core_msgs/ball_position.h"
-#include "opencv2/imgcodecs.hpp"
-#include "opencv2/opencv.hpp"
 
 #define PI 3.14159265
 
