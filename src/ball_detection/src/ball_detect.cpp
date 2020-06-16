@@ -24,6 +24,14 @@ const cv::Scalar HSV_THRESHOLD_GREEN_HIGH(70, 255, 255);
 
 const int low_b_b = 150, high_g_b = 50, high_r_b = 50;
 
+struct BallDetectData
+{
+  std::vector<cv::Vec4i> hierarchy;
+  std::vector<std::vector<cv::Point> > contours;
+  std::vector<cv::Point2f> centers;
+  std::vector<float> radii;
+};
+
 // Initialization of variable for camera calibration paramters.
 // You should change this if you changed the size of the image.
 
@@ -49,10 +57,9 @@ void morphOps(cv::Mat& thresh)
   cv::morphologyEx(thresh, thresh, cv::MORPH_OPEN, erodeElement);
 }
 
-void extractBall(cv::Mat& hsv_frame, int low_threshold, int ratio, int kernel_size, std::vector<cv::Vec4i>* hierarchy,
-                 std::vector<std::vector<cv::Point> >* contours, std::vector<cv::Point2f>* centers,
-                 std::vector<float>* radii)
+BallDetectData extractBall(cv::Mat& hsv_frame, int low_threshold, int ratio, int kernel_size)
 {
+  BallDetectData data;
   cv::Mat hsv_frame_1, hsv_frame_2;
 
   // Blur and erode, dilate
@@ -66,24 +73,26 @@ void extractBall(cv::Mat& hsv_frame, int low_threshold, int ratio, int kernel_si
   cv::Canny(hsv_frame, img_canny, low_threshold, low_threshold * ratio, kernel_size);
 
   // Finding Contours for blue threshold image
-  hierarchy->clear();
-  contours->clear();
-  cv::findContours(img_canny, *contours, *hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
+  data.hierarchy.clear();
+  data.contours.clear();
+  cv::findContours(img_canny, data.contours, data.hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
   // Define variables for contour poly, center of circles, radius of circles
-  std::vector<std::vector<cv::Point> > contours_poly(contours->size());
-  centers->clear();
-  centers->resize(contours->size());
-  radii->clear();
-  radii->resize(contours->size());
+  std::vector<std::vector<cv::Point> > contours_poly(data.contours.size());
+  data.centers.clear();
+  data.centers.resize(data.contours.size());
+  data.radii.clear();
+  data.radii.resize(data.contours.size());
 
   // Finding balls by contours
   // Find polygon from contours and find the minimun size enclosing circle of that polygon.
-  for (size_t i = 0; i < contours->size(); i++)
+  for (size_t i = 0; i < data.contours.size(); i++)
   {
-    cv::approxPolyDP(contours->at(i), contours_poly[i], 1, true);
-    cv::minEnclosingCircle(contours_poly[i], centers->at(i), radii->at(i));
+    cv::approxPolyDP(data.contours[i], contours_poly[i], 1, true);
+    cv::minEnclosingCircle(contours_poly[i], data.centers[i], data.radii[i]);
   }
+
+  return data;
 }
 // Declaration of functions that calculates the ball position from pixel position.
 std::vector<float> pixel2point(cv::Point center, int radius)
@@ -106,23 +115,22 @@ std::vector<float> pixel2point(cv::Point center, int radius)
   return position;
 }
 
-void addBallData(decltype(core_msgs::ball_position::blue_balls)* ball_data, const std::vector<cv::Vec4i>& hierarchy,
-                 const std::vector<std::vector<cv::Point> >& contours, const std::vector<cv::Point2f>& centers,
-                 const std::vector<float>& radii, const cv::Scalar& ball_color, cv::Mat* result)
+void addBallData(decltype(core_msgs::ball_position::blue_balls)* ball_data, const BallDetectData& data,
+                 const cv::Scalar& ball_color, cv::Mat* result)
 {
-  for (size_t i = 0; i < contours.size(); i++)
+  for (size_t i = 0; i < data.contours.size(); i++)
   {
-    if (hierarchy[i][3] == -1 && radii[i] > iMin_tracking_ball_size)
+    if (data.hierarchy[i][3] == -1 && data.radii[i] > iMin_tracking_ball_size)
     {
       // find the pixel point of the circle cneter, and the pixel radius of an circle
 
-      float px = centers[i].x;
-      float py = centers[i].y;
-      float pr = radii[i];
+      float px = data.centers[i].x;
+      float py = data.centers[i].y;
+      float pr = data.radii[i];
 
       // change the pixel value to real world value
 
-      std::vector<float> ball_pos = pixel2point(centers[i], radii[i]);
+      std::vector<float> ball_pos = pixel2point(data.centers[i], data.radii[i]);
 
       // draw the circle at the result cv::Mat matrix
       // putText puts text at the matrix, puts text, at the point of an image
@@ -137,8 +145,8 @@ void addBallData(decltype(core_msgs::ball_position::blue_balls)* ball_data, cons
 
       std::string text = "x: " + sx + ", y: " + sy + ", z: " + sz;
       cv::Scalar text_color = cv::Scalar(0, 255, 0);  // (blue, green, red)
-      putText(*result, text, centers[i], 2, 1, text_color, 2);
-      circle(*result, centers[i], static_cast<int>(radii[i]), ball_color, 2, 8, 0);
+      putText(*result, text, data.centers[i], 2, 1, text_color, 2);
+      circle(*result, data.centers[i], static_cast<int>(data.radii[i]), ball_color, 2, 8, 0);
 
       // push back variables of real ball position to the message variable
       ball_data->emplace_back();
@@ -191,21 +199,16 @@ void ball_detect(const cv::Mat& buffer)
   int ratio = 3;
   int kernel_size = 3;
 
-  std::vector<cv::Vec4i> hierarchy_r, hierarchy_b, hierarchy_g;
-  std::vector<std::vector<cv::Point> > contours_r, contours_b, contours_g;
-  std::vector<cv::Point2f> center_r, center_b, center_g;
-  std::vector<float> radius_r, radius_b, radius_g;
-
-  extractBall(hsv_frame_red, lowThreshold, ratio, kernel_size, &hierarchy_r, &contours_r, &center_r, &radius_r);
-  extractBall(hsv_frame_blue, lowThreshold, ratio, kernel_size, &hierarchy_b, &contours_b, &center_b, &radius_b);
-  extractBall(hsv_frame_green, lowThreshold, ratio, kernel_size, &hierarchy_g, &contours_g, &center_g, &radius_g);
+  BallDetectData data_r = extractBall(hsv_frame_red, lowThreshold, ratio, kernel_size);
+  BallDetectData data_b = extractBall(hsv_frame_blue, lowThreshold, ratio, kernel_size);
+  BallDetectData data_g = extractBall(hsv_frame_green, lowThreshold, ratio, kernel_size);
 
   // Declare message variable to publish
   core_msgs::ball_position msg;
 
-  addBallData(&msg.blue_balls, hierarchy_b, contours_b, center_b, radius_b, cv::viz::Color::blue(), &result);
-  addBallData(&msg.red_balls, hierarchy_r, contours_r, center_r, radius_r, cv::viz::Color::red(), &result);
-  addBallData(&msg.green_balls, hierarchy_g, contours_g, center_g, radius_g, cv::viz::Color::green(), &result);
+  addBallData(&msg.red_balls, data_r, cv::viz::Color::red(), &result);
+  addBallData(&msg.blue_balls, data_b, cv::viz::Color::blue(), &result);
+  addBallData(&msg.green_balls, data_g, cv::viz::Color::green(), &result);
 
   // show what is published at the terminal
   ROS_INFO("blue: %lu", msg.blue_balls.size());
