@@ -208,29 +208,24 @@ void VisibleFeatureManager::subscribeToLidar(const sensor_msgs::LaserScan::Const
 
 void VisibleFeatureManager::subscribeToCamera(const core_msgs::ball_position::ConstPtr& msg)
 {
-  ROS_ASSERT_MSG(msg->blue_x.size() == msg->blue_y.size(), "Number of X and Y coordinates must be equal (%lu != %lu)",
-                 msg->blue_x.size(), msg->blue_y.size());
-  ROS_ASSERT_MSG(msg->red_x.size() == msg->red_y.size(), "Number of X and Y coordinates must be equal (%lu != %lu)",
-                 msg->red_x.size(), msg->red_y.size());
-  ROS_ASSERT_MSG(msg->green_x.size() == msg->green_y.size(), "Number of X and Y coordinates must be equal (%lu != %lu)",
-                 msg->green_x.size(), msg->blue_y.size());
-
   // 기존의 공을 모두 지웁니다
   balls_.clear();
 
-  for (decltype(msg->blue_x)::size_type i = 0; i < msg->blue_x.size(); ++i)
+  // 공의 (x, y, z) 좌표에서 x축은 로봇과 동일하지만 z축은 로봇이 바라보는 방향입니다.
+  // 로봇에 대한 평면 좌표계를 사용하려면 y축 대신 z축을 사용해야 합니다.
+  for (auto& ball : msg->blue_balls)
   {
-    addBall(Ball::fromRelXY(BallColor::Blue, msg->blue_x[i], msg->blue_y[i]));
+    addBall(Ball::fromRelXY(BallColor::Blue, ball.x, ball.z));
   }
 
-  for (decltype(msg->red_x)::size_type i = 0; i < msg->red_x.size(); ++i)
+  for (auto& ball : msg->red_balls)
   {
-    addBall(Ball::fromRelXY(BallColor::Red, msg->red_x[i], msg->red_y[i]));
+    addBall(Ball::fromRelXY(BallColor::Red, ball.x, ball.z));
   }
 
-  for (decltype(msg->green_x)::size_type i = 0; i < msg->green_x.size(); ++i)
+  for (auto& ball : msg->green_balls)
   {
-    addBall(Ball::fromRelXY(BallColor::Green, msg->green_x[i], msg->green_y[i]));
+    addBall(Ball::fromRelXY(BallColor::Green, ball.x, ball.z));
   }
 
   is_blue_ball_captured_ = msg->still_blue;

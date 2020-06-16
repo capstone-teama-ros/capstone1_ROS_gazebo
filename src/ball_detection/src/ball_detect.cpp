@@ -111,9 +111,9 @@ std::vector<float> pixel2point(cv::Point center, int radius)
   return position;
 }
 
-void addBallData(decltype(core_msgs::ball_position::red_x)* ball_x, decltype(core_msgs::ball_position::red_y)* ball_y,
-                 const std::vector<cv::Vec4i>& hierarchy, const std::vector<std::vector<cv::Point> >& contours,
-                 const std::vector<cv::Point2f>& centers, const std::vector<float>& radii, const cv::Scalar& ball_color)
+void addBallData(decltype(core_msgs::ball_position::blue_balls)* ball_data, const std::vector<cv::Vec4i>& hierarchy,
+                 const std::vector<std::vector<cv::Point> >& contours, const std::vector<cv::Point2f>& centers,
+                 const std::vector<float>& radii, const cv::Scalar& ball_color)
 {
   for (size_t i = 0; i < contours.size(); i++)
   {
@@ -146,8 +146,11 @@ void addBallData(decltype(core_msgs::ball_position::red_x)* ball_x, decltype(cor
       circle(result, centers[i], static_cast<int>(radii[i]), ball_color, 2, 8, 0);
 
       // push back variables of real ball position to the message variable
-      ball_x->push_back(ball_pos[0]);
-      ball_y->push_back(ball_pos[2]);
+      ball_data->emplace_back();
+      auto new_ball = ball_data->back();
+      new_ball.x = ball_pos[0];
+      new_ball.y = ball_pos[1];
+      new_ball.z = ball_pos[2];
     }
   }
 }
@@ -205,34 +208,27 @@ void ball_detect()
   // Declare message variable to publish
   core_msgs::ball_position msg;
 
-  addBallData(&msg.blue_x, &msg.blue_y, hierarchy_b, contours_b, center_b, radius_b, cv::viz::Color::blue());
-  addBallData(&msg.red_x, &msg.red_y, hierarchy_r, contours_r, center_r, radius_r, cv::viz::Color::red());
-  addBallData(&msg.green_x, &msg.green_y, hierarchy_g, contours_g, center_g, radius_g, cv::viz::Color::green());
+  addBallData(&msg.blue_balls, hierarchy_b, contours_b, center_b, radius_b, cv::viz::Color::blue());
+  addBallData(&msg.red_balls, hierarchy_r, contours_r, center_r, radius_r, cv::viz::Color::red());
+  addBallData(&msg.green_balls, hierarchy_g, contours_g, center_g, radius_g, cv::viz::Color::green());
 
-  msg.blue_num = msg.blue_x.size();
-  msg.red_num = msg.red_x.size();
-  msg.green_num = msg.green_x.size();
   // show what is published at the terminal
-  std::cout << msg.blue_num << std::endl;
-  for (int i = 0; i < msg.blue_x.size(); i++)
+  ROS_INFO("blue: %lu", msg.blue_balls.size());
+  for (auto& ball_pos : msg.blue_balls)
   {
-    std::cout << msg.blue_x[i] << std::endl;
-    std::cout << msg.blue_y[i] << std::endl;
+    ROS_INFO("  x = %.4f, y = %.4f, z = %.4f", ball_pos.x, ball_pos.y, ball_pos.z);
+  }
+  ROS_INFO("red: %lu", msg.blue_balls.size());
+  for (auto& ball_pos : msg.red_balls)
+  {
+    ROS_INFO("  x = %.4f, y = %.4f, z = %.4f", ball_pos.x, ball_pos.y, ball_pos.z);
+  }
+  ROS_INFO("green: %lu", msg.blue_balls.size());
+  for (auto& ball_pos : msg.green_balls)
+  {
+    ROS_INFO("  x = %.4f, y = %.4f, z = %.4f", ball_pos.x, ball_pos.y, ball_pos.z);
   }
 
-  std::cout << msg.red_num << std::endl;
-  for (int i = 0; i < msg.red_x.size(); i++)
-  {
-    std::cout << msg.red_x[i] << std::endl;
-    std::cout << msg.red_y[i] << std::endl;
-  }
-
-  std::cout << msg.green_num << std::endl;
-  for (int i = 0; i < msg.green_x.size(); i++)
-  {
-    std::cout << msg.green_x[i] << std::endl;
-    std::cout << msg.green_y[i] << std::endl;
-  }
   pub.publish(msg);  // publish a message
   cv::imshow("result", result);
 }
