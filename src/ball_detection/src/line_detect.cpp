@@ -18,12 +18,9 @@
 
 #define PI 3.14159265
 
-using namespace std;
-using namespace cv;
-
 core_msgs::line_info msg1;
-Mat img;
-Mat img_filt;
+cv::Mat img;
+cv::Mat img_filt;
 
 void imageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
@@ -57,13 +54,13 @@ void colorthresh(cv::Mat input)
   auto h = s.height;
   auto c_x = 0.0;
   // Detect all objects within the HSV range
-  //  Mat img_hsv;
+  //  cv::Mat img_hsv;
   //  cv::cvtColor(input, img_hsv, CV_BGR2HSV);
-  Scalar LowerBlack;
-  Scalar UpperBlack;
+  cv::Scalar LowerBlack;
+  cv::Scalar UpperBlack;
   LowerBlack = { 0, 0, 0 };
   UpperBlack = { 30, 30, 30 };
-  Mat img_mask;
+  cv::Mat img_mask;
   cv::inRange(input, LowerBlack, UpperBlack, img_mask);
   img_mask(cv::Rect(0, 0, w, 0.8 * h)) = 0;
   // Find contours for better visualization
@@ -84,7 +81,7 @@ void colorthresh(cv::Mat input)
       }
       count++;
     }
-    cv::Rect rect = boundingRect(v[idx]);
+    cv::Rect rect = cv::boundingRect(v[idx]);
     cv::Point pt1, pt2, pt3;
     pt1.x = rect.x;
     pt1.y = rect.y;
@@ -99,7 +96,7 @@ void colorthresh(cv::Mat input)
     msg1.h = rect.height;
 
     // Drawing the rectangle using points obtained
-    rectangle(input, pt1, pt2, CV_RGB(255, 0, 0), 2);
+    cv::rectangle(input, pt1, pt2, CV_RGB(255, 0, 0), 2);
     // Inserting text box
     cv::putText(input, "Line Detected", pt3, CV_FONT_HERSHEY_COMPLEX, 1, CV_RGB(255, 0, 0));
   }
@@ -139,7 +136,7 @@ void colorthresh(cv::Mat input)
   }
   // Output images viewed by the turtlebot
   cv::namedWindow("Robot View");
-  imshow("Robot View", input);
+  cv::imshow("Robot View", input);
 }
 
 int main(int argc, char** argv)
