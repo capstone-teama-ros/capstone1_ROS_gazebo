@@ -1,4 +1,5 @@
 #include <core_msgs/ball_position.h>
+#include <core_msgs/line_info.h>
 #include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/LaserScan.h>
@@ -20,7 +21,8 @@ int main(int argc, char** argv)
       n.subscribe<sensor_msgs::LaserScan>("/scan", 1000, &VisibleFeatureManager::subscribeToLidar, &visible_features);
   ros::Subscriber sub_ball_harvest = n.subscribe<core_msgs::ball_position>(
       "/position", 1000, &VisibleFeatureManager::subscribeToCamera, &visible_features);
-  // ros::Subscriber sub_line_tracing = n.subscribe<core_msgs::line_info>("/line_info", 1000, camera_Callback_2);
+  ros::Subscriber sub_line_tracing = n.subscribe<core_msgs::line_info>(
+      "/line_info", 1000, &VisibleFeatureManager::subscribeToLineInfo, &visible_features);
   ros::Subscriber sub_imu =
       n.subscribe<sensor_msgs::Imu>("/imu", 1000, &VisibleFeatureManager::subscribeToImu, &visible_features);
 
