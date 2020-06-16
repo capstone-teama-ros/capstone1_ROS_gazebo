@@ -12,13 +12,15 @@
 // Setting Thresholds for red and blue part of image.
 // Changable to fit your enviroment. If you want to use bgr, it should be different.
 
-int low_h2_r = 169, high_h2_r = 180;
-int low_h_r = 0, low_s_r = 134, low_v_r = 106;
-int high_h_r = 8, high_s_r = 255, high_v_r = 255;
-int low_h_b = 100, low_s_b = 126, low_v_b = 60;
-int high_h_b = 121, high_s_b = 255, high_v_b = 255;
-int low_h_g = 50, low_s_g = 126, low_v_g = 60;
-int high_h_g = 70, high_s_g = 255, high_v_g = 255;  // 임의로 초록색 범위 설정 실험후 조정 필요할듯?
+const cv::Scalar HSV_THRESHOLD_RED1_LOW(0, 134, 106);
+const cv::Scalar HSV_THRESHOLD_RED1_HIGH(8, 255, 255);
+const cv::Scalar HSV_THRESHOLD_RED2_LOW(169, 134, 106);
+const cv::Scalar HSV_THRESHOLD_RED2_HIGH(180, 255, 255);
+const cv::Scalar HSV_THRESHOLD_BLUE_LOW(100, 126, 60);
+const cv::Scalar HSV_THRESHOLD_BLUE_HIGH(121, 255, 255);
+const cv::Scalar HSV_THRESHOLD_GREEN_LOW(50, 126, 60);
+const cv::Scalar HSV_THRESHOLD_GREEN_HIGH(70, 255, 255);
+
 int low_b_b = 150, high_g_b = 50, high_r_b = 50;
 
 // Initialization of variable for camera calibration paramters.
@@ -102,14 +104,10 @@ void ball_detect()
   cv::cvtColor(calibrated_frame, hsv_frame, cv::COLOR_BGR2HSV);
 
   // Threshold
-  cv::inRange(hsv_frame, cv::Scalar(low_h_r, low_s_r, low_v_r), cv::Scalar(high_h_r, high_s_r, high_v_r),
-              hsv_frame_red1);
-  cv::inRange(hsv_frame, cv::Scalar(low_h2_r, low_s_r, low_v_r), cv::Scalar(high_h2_r, high_s_r, high_v_r),
-              hsv_frame_red2);
-  cv::inRange(hsv_frame, cv::Scalar(low_h_b, low_s_b, low_v_b), cv::Scalar(high_h_b, high_s_b, high_v_b),
-              hsv_frame_blue);
-  cv::inRange(hsv_frame, cv::Scalar(low_h_g, low_s_g, low_v_g), cv::Scalar(high_h_g, high_s_g, high_v_g),
-              hsv_frame_green);
+  cv::inRange(hsv_frame, HSV_THRESHOLD_RED1_LOW, HSV_THRESHOLD_RED1_HIGH, hsv_frame_red1);
+  cv::inRange(hsv_frame, HSV_THRESHOLD_RED2_LOW, HSV_THRESHOLD_RED2_HIGH, hsv_frame_red2);
+  cv::inRange(hsv_frame, HSV_THRESHOLD_BLUE_LOW, HSV_THRESHOLD_BLUE_HIGH, hsv_frame_blue);
+  cv::inRange(hsv_frame, HSV_THRESHOLD_GREEN_LOW, HSV_THRESHOLD_GREEN_HIGH, hsv_frame_green);
   cv::addWeighted(hsv_frame_red1, 1.0, hsv_frame_red2, 1.0, 0.0, hsv_frame_red);
 
   // Blur and erode, dilate
