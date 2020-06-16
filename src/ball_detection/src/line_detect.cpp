@@ -9,8 +9,6 @@
 #include <opencv2/imgproc.hpp>
 #include <string>
 
-#define PI 3.14159265
-
 core_msgs::line_info msg1;
 cv::Mat img;
 cv::Mat img_filt;
@@ -49,12 +47,10 @@ void colorthresh(cv::Mat input)
   // Detect all objects within the HSV range
   //  cv::Mat img_hsv;
   //  cv::cvtColor(input, img_hsv, CV_BGR2HSV);
-  cv::Scalar LowerBlack;
-  cv::Scalar UpperBlack;
-  LowerBlack = { 0, 0, 0 };
-  UpperBlack = { 30, 30, 30 };
+  cv::Scalar lower_black(0, 0, 0);
+  cv::Scalar upper_black(30, 30, 30);
   cv::Mat img_mask;
-  cv::inRange(input, LowerBlack, UpperBlack, img_mask);
+  cv::inRange(input, lower_black, upper_black, img_mask);
   img_mask(cv::Rect(0, 0, w, 0.8 * h)) = 0;
   // Find contours for better visualization
   cv::findContours(img_mask, v, CV_RETR_LIST, CV_CHAIN_APPROX_NONE);

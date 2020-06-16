@@ -9,8 +9,6 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
-#define PI 3.14159265
-
 // Setting Thresholds for red and blue part of image.
 // Changable to fit your enviroment. If you want to use bgr, it should be different.
 
@@ -29,11 +27,10 @@ int low_b_b = 150, high_g_b = 50, high_r_b = 50;
 float intrinsic_data[9] = { 1206.8897719532354, 0.0, 960.5, 0.0, 1206.8897719532354, 540.5, 0.0, 0.0, 1.0 };
 float distortion_data[5] = { 0, 0, 0, 0, 0 };
 
-// Initialization of variable for text drawing
-cv::String text;
-int iMin_tracking_ball_size =
-    5;                        // Minimum ball radius size by pixels. If ball is smaller than this, it won't be searched.
-float fball_diameter = 0.14;  // Initialization of variable for dimension of the target(real ball diameter by meter)
+// Minimum ball radius size by pixels. If ball is smaller than this, it won't be searched.
+int iMin_tracking_ball_size = 5;
+// Initialization of variable for dimension of the target(real ball diameter by meter)
+float fball_diameter = 0.14;
 
 // Setting cv::Mat variables for images.
 cv::Mat buffer;
@@ -73,22 +70,6 @@ std::vector<float> pixel2point(cv::Point center, int radius)
   position.push_back(Yc);
   position.push_back(Zc);
   return position;
-}
-
-// Changing int variable to std::string.
-std::string intToString(int n)
-{
-  std::stringstream s;
-  s << n;
-  return s.str();
-}
-
-// Changing float variable to std::string.
-std::string floatToString(float f)
-{
-  std::ostringstream buffer;
-  buffer << f;
-  return buffer.str();
 }
 
 void ball_detect()
@@ -250,9 +231,9 @@ void ball_detect()
         float isy = ball_pos_b[1];
         float isz = ball_pos_b[2];
 
-        std::string sx = floatToString(isx);
-        std::string sy = floatToString(isy);
-        std::string sz = floatToString(isz);
+        std::string sx = std::to_string(isx);
+        std::string sy = std::to_string(isy);
+        std::string sz = std::to_string(isz);
 
         std::string text;
         text = "x: " + sx + ", y: " + sy + ", z: " + sz;
@@ -289,9 +270,9 @@ void ball_detect()
         float isy = ball_pos_r[1];
         float isz = ball_pos_r[2];
 
-        std::string sx = floatToString(isx);
-        std::string sy = floatToString(isy);
-        std::string sz = floatToString(isz);
+        std::string sx = std::to_string(isx);
+        std::string sy = std::to_string(isy);
+        std::string sz = std::to_string(isz);
 
         std::string text;
         text = "x: " + sx + ", y: " + sy + ", z: " + sz;
@@ -332,9 +313,9 @@ void ball_detect()
         float isy = ball_pos_g[1];
         float isz = ball_pos_g[2];
 
-        std::string sx = floatToString(isx);
-        std::string sy = floatToString(isy);
-        std::string sz = floatToString(isz);
+        std::string sx = std::to_string(isx);
+        std::string sy = std::to_string(isy);
+        std::string sz = std::to_string(isz);
 
         std::string text;
         text = "x: " + sx + ", y: " + sy + ", z: " + sz;
