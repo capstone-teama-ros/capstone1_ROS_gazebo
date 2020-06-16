@@ -2,6 +2,7 @@
 #define DATA_INTEGRATE_FEATURES_VISIBLE_FEATURE_MANAGER_H
 
 #include <core_msgs/ball_position.h>
+#include <core_msgs/line_info.h>
 #include <geometry_msgs/Vector3.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/LaserScan.h>
@@ -16,7 +17,7 @@ class VisibleFeatureManager
 {
 public:
   /**
-   * 카메라의 topic에 subscribe하여 데이터를 받기 위한 callback입니다.
+   * 카메라의 ball detection topic에 subscribe하여 데이터를 받기 위한 callback입니다.
    *
    * @param msg topic으로부터 받는 데이터 메시지
    */
@@ -38,6 +39,13 @@ public:
    * @param msg topic으로부터 받는 데이터 메시지
    */
   void subscribeToImu(const sensor_msgs::Imu::ConstPtr& msg);
+
+  /**
+   * 카메라의 line tracer topic에 subscribe하여 데이터를 받기 위한 callback입니다.
+   *
+   * @param msg topic으로부터 받는 데이터 메시지
+   */
+  void subscribeToLineInfo(const core_msgs::line_info::ConstPtr& msg);
 
   /**
    * 가장 최근에 카메라로 관측한 공의 목록을 가져옵니다.
@@ -97,6 +105,54 @@ public:
   }
 
   /**
+   * @returns 라인트레이서: 카메라에 검은 선이 보이는지 여부
+   */
+  bool getTracerHasLine() const
+  {
+    return line_tracer_has_line_;
+  }
+
+  /**
+   * @returns 라인트레이서: 검은 줄이 속한 구간 번호 (line_detect.cpp 참고)
+   */
+  int getTracerSection() const
+  {
+    return line_tracer_section_;
+  }
+
+  /**
+   * @returns 라인트레이서: 검은 줄의 bounding box의 x좌표 (픽셀)
+   */
+  int getTracerBoxX() const
+  {
+    return line_tracer_box_x_;
+  }
+
+  /**
+   * @returns 라인트레이서: 검은 줄의 bounding box의 y좌표 (픽셀)
+   */
+  int getTracerBoxY() const
+  {
+    return line_tracer_box_y_;
+  }
+
+  /**
+   * @returns 라인트레이서: 검은 줄의 bounding box의 너비 (픽셀)
+   */
+  int getTracerBoxWidth() const
+  {
+    return line_tracer_box_width_;
+  }
+
+  /**
+   * @returns 라인트레이서: 검은 줄의 bounding box의 높이 (픽셀)
+   */
+  int getTracerBoxHeight() const
+  {
+    return line_tracer_box_height_;
+  }
+
+  /**
    * 기억 중인 모든 feature 정보를 지웁니다.
    */
   void clearAllFeatures();
@@ -108,6 +164,12 @@ private:
   bool is_blue_ball_captured_ = false;
   ImuVectorT imu_angular_velocity_;     ///< (x축, y축, z축) (rad/s)
   ImuVectorT imu_linear_acceleration_;  ///< (x, y, z) (m/s^2)
+  bool line_tracer_has_line_ = false;
+  int line_tracer_section_;
+  int line_tracer_box_x_;
+  int line_tracer_box_y_;
+  int line_tracer_box_width_;
+  int line_tracer_box_height_;
 };
 
 #endif  // DATA_INTEGRATE_FEATURES_VISIBLE_FEATURE_MANAGER_H

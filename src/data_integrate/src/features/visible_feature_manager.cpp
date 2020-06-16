@@ -248,3 +248,13 @@ void VisibleFeatureManager::subscribeToImu(const sensor_msgs::Imu::ConstPtr& msg
   imu_angular_velocity_ = msg->angular_velocity;
   imu_linear_acceleration_ = msg->linear_acceleration;
 }
+
+void VisibleFeatureManager::subscribeToLineInfo(const core_msgs::line_info::ConstPtr& msg)
+{
+  line_tracer_has_line_ = static_cast<bool>(msg->is_bump);
+  line_tracer_section_ = msg->section;
+  line_tracer_box_x_ = msg->x;
+  line_tracer_box_y_ = msg->y;
+  line_tracer_box_width_ = msg->w;
+  line_tracer_box_height_ = msg->h;
+}
