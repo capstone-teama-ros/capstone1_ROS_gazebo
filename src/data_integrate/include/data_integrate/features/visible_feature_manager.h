@@ -40,6 +40,13 @@ public:
   void subscribeToImu(const sensor_msgs::Imu::ConstPtr& msg);
 
   /**
+   * subscribing to line_info msg
+   *
+  */
+
+  //void subscribeToLineInfo(const core_msgs::line_info::ConstPtr& msg);
+
+  /**
    * 가장 최근에 카메라로 관측한 공의 목록을 가져옵니다.
    */
   const BallCollection& getBalls() const
@@ -54,6 +61,8 @@ public:
   {
     return lidar_points_;
   }
+
+
 
   /**
    * 현재 파란 공이 포획되어 있는지 확인합니다.
@@ -99,6 +108,7 @@ private:
   bool is_blue_ball_captured_ = false;
   ImuVectorT imu_angular_velocity_;     ///< (x축, y축, z축) (rad/s)
   ImuVectorT imu_linear_acceleration_;  ///< (x, y, z) (m/s^2)
+  int line_section_;
 };
 
 #endif  // DATA_INTEGRATE_FEATURES_VISIBLE_FEATURE_MANAGER_H

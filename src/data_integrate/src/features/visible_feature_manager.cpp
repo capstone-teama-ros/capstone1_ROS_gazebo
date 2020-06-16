@@ -25,6 +25,12 @@ void VisibleFeatureManager::subscribeToLidar(const sensor_msgs::LaserScan::Const
   }
 }
 
+// void VisibleFeatureManager::subscribetoLineInfo(const core_msgs::line_info::ConstPtr& msg)
+// {
+//   // TODO : get line_info data
+  
+// }
+
 void VisibleFeatureManager::subscribeToCamera(const core_msgs::ball_position::ConstPtr& msg)
 {
   ROS_ASSERT_MSG(msg->blue_x.size() == msg->blue_y.size(), "Number of X and Y coordinates must be equal (%lu != %lu)",

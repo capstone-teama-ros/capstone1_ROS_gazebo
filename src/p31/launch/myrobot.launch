@@ -14,7 +14,7 @@
 
   	<arg name="y_pos" default="3.2"/>
 
-  	<arg name="z_pos" default="0.12"/>
+  	<arg name="z_pos" default="0.2"/>
 
 	<arg name="yo_pos" default="0"/>
 

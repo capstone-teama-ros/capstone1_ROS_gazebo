@@ -145,7 +145,7 @@ void colorthresh(cv::Mat input)
 int main(int argc, char** argv)
 {
   // Initializing node and object
-  ros::init(argc, argv, "line_detect");
+  ros::init(argc, argv, "line_detect_node");
   ros::NodeHandle n;
   // Creating Publisher and subscriber
   ros::Subscriber sub = n.subscribe("/camera2/rgb/image_raw2", 1, imageCallback);
