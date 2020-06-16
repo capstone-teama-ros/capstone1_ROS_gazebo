@@ -35,11 +35,6 @@ const int iMin_tracking_ball_size = 5;
 // Initialization of variable for dimension of the target(real ball diameter by meter)
 const float fball_diameter = 0.14;
 
-// Setting cv::Mat variables for images.
-cv::Mat buffer;
-cv::Mat buffer2;
-cv::Mat result;
-
 // Setting Publishers
 ros::Publisher pub;
 ros::Publisher pub_markers;
@@ -113,7 +108,7 @@ std::vector<float> pixel2point(cv::Point center, int radius)
 
 void addBallData(decltype(core_msgs::ball_position::blue_balls)* ball_data, const std::vector<cv::Vec4i>& hierarchy,
                  const std::vector<std::vector<cv::Point> >& contours, const std::vector<cv::Point2f>& centers,
-                 const std::vector<float>& radii, const cv::Scalar& ball_color)
+                 const std::vector<float>& radii, const cv::Scalar& ball_color, cv::Mat* result)
 {
   for (size_t i = 0; i < contours.size(); i++)
   {
@@ -142,8 +137,8 @@ void addBallData(decltype(core_msgs::ball_position::blue_balls)* ball_data, cons
 
       std::string text = "x: " + sx + ", y: " + sy + ", z: " + sz;
       cv::Scalar text_color = cv::Scalar(0, 255, 0);  // (blue, green, red)
-      putText(result, text, centers[i], 2, 1, text_color, 2);
-      circle(result, centers[i], static_cast<int>(radii[i]), ball_color, 2, 8, 0);
+      putText(*result, text, centers[i], 2, 1, text_color, 2);
+      circle(*result, centers[i], static_cast<int>(radii[i]), ball_color, 2, 8, 0);
 
       // push back variables of real ball position to the message variable
       ball_data->emplace_back();
@@ -155,7 +150,7 @@ void addBallData(decltype(core_msgs::ball_position::blue_balls)* ball_data, cons
   }
 }
 
-void ball_detect()
+void ball_detect(const cv::Mat& buffer)
 {
   // Declare intrinsic and distortions by using the variable declared before.
   cv::Mat intrinsic = cv::Mat(3, 3, CV_32F, intrinsic_data);
@@ -179,7 +174,7 @@ void ball_detect()
   cv::Mat hsv_frame_green;
 
   // Making clone of original image for drawing circles.
-  result = calibrated_frame.clone();
+  cv::Mat result = calibrated_frame.clone();
 
   // Change RGB frame to HSV frame
   cv::cvtColor(calibrated_frame, hsv_frame, cv::COLOR_BGR2HSV);
@@ -208,9 +203,9 @@ void ball_detect()
   // Declare message variable to publish
   core_msgs::ball_position msg;
 
-  addBallData(&msg.blue_balls, hierarchy_b, contours_b, center_b, radius_b, cv::viz::Color::blue());
-  addBallData(&msg.red_balls, hierarchy_r, contours_r, center_r, radius_r, cv::viz::Color::red());
-  addBallData(&msg.green_balls, hierarchy_g, contours_g, center_g, radius_g, cv::viz::Color::green());
+  addBallData(&msg.blue_balls, hierarchy_b, contours_b, center_b, radius_b, cv::viz::Color::blue(), &result);
+  addBallData(&msg.red_balls, hierarchy_r, contours_r, center_r, radius_r, cv::viz::Color::red(), &result);
+  addBallData(&msg.green_balls, hierarchy_g, contours_g, center_g, radius_g, cv::viz::Color::green(), &result);
 
   // show what is published at the terminal
   ROS_INFO("blue: %lu", msg.blue_balls.size());
@@ -233,7 +228,7 @@ void ball_detect()
   cv::imshow("result", result);
 }
 
-void ball_check()
+void ball_check(const cv::Mat& buffer2)
 {
   core_msgs::ball_ch msg;
   //  ROS_INFO("%s", buffer2.at<cv::Vec3b>(320,240)[0].c_str());          //확인해보려고 출력해보려했는데 오류떠서
@@ -252,11 +247,7 @@ void ball_check()
 
 void imageCallback1(const sensor_msgs::ImageConstPtr& msg)
 {
-  if (msg->height == 480 && buffer.size().width == 320)
-  {  // check the size of the image received. if the image have 640x480, then change the buffer size to 640x480.
-    std::cout << "resized" << std::endl;
-    cv::resize(buffer, buffer, cv::Size(640, 480));
-  }
+  static cv::Mat buffer;
   try
   {
     buffer = cv_bridge::toCvShare(msg, "bgr8")->image;
@@ -265,26 +256,22 @@ void imageCallback1(const sensor_msgs::ImageConstPtr& msg)
   {
     ROS_ERROR("Could not convert from '%s' to 'bgr8'.", msg->encoding.c_str());
   }
-  ball_detect();
+  ball_detect(buffer);
   cv::waitKey(1);
 }
 
 void imageCallback2(const sensor_msgs::ImageConstPtr& msg)
 {
-  if (msg->height == 480 && buffer.size().width == 320)
-  {  // check the size of the image received. if the image have 640x480, then change the buffer size to 640x480.
-    std::cout << "resized" << std::endl;
-    cv::resize(buffer2, buffer2, cv::Size(640, 480));
-  }
+  cv::Mat buffer;
   try
   {
-    buffer2 = cv_bridge::toCvShare(msg, "bgr8")->image;
+    buffer = cv_bridge::toCvShare(msg, "bgr8")->image;
   }  // transfer the image data into buffer
   catch (cv_bridge::Exception& e)
   {
     ROS_ERROR("Could not convert from '%s' to 'bgr8'.", msg->encoding.c_str());
   }
-  ball_check();
+  ball_check(buffer);
   cv::waitKey(1);
 }
 
