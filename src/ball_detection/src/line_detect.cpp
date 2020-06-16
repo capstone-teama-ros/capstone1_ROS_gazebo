@@ -10,23 +10,7 @@
 #include <string>
 
 core_msgs::line_info msg1;
-cv::Mat img;
-cv::Mat img_filt;
-
-void imageCallback(const sensor_msgs::ImageConstPtr& msg)
-{
-  cv_bridge::CvImagePtr cv_ptr;
-  try
-  {
-    cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-    img = cv_ptr->image;
-    cv::waitKey(30);
-  }
-  catch (cv_bridge::Exception& e)
-  {
-    ROS_ERROR("Could not convert from '%s' to 'bgr8'.", msg->encoding.c_str());
-  }
-}
+ros::Publisher dirPub;
 
 cv::Mat Gauss(cv::Mat input)
 {
@@ -81,6 +65,7 @@ void colorthresh(cv::Mat input)
     pt2.y = rect.y + rect.height;
     pt3.x = pt1.x + 5;
     pt3.y = pt1.y - 5;
+    ROS_INFO("x = %d, y = %d, w = %d, h = %d", rect.x, rect.y, rect.width, rect.height);
 
     msg1.x = pt1.x;
     msg1.y = pt1.y;
@@ -88,9 +73,9 @@ void colorthresh(cv::Mat input)
     msg1.h = rect.height;
 
     // Drawing the rectangle using points obtained
-    cv::rectangle(input, pt1, pt2, CV_RGB(255, 0, 0), 2);
+    // cv::rectangle(input, pt1, pt2, CV_RGB(255, 0, 0), 2);
     // Inserting text box
-    cv::putText(input, "Line Detected", pt3, CV_FONT_HERSHEY_COMPLEX, 1, CV_RGB(255, 0, 0));
+    // cv::putText(input, "Line Detected", pt3, CV_FONT_HERSHEY_COMPLEX, 1, CV_RGB(255, 0, 0));
   }
   // Mask image to limit the future turns affecting the output
   img_mask(cv::Rect(0.7 * w, 0, 0.3 * w, h)) = 0;
@@ -127,8 +112,31 @@ void colorthresh(cv::Mat input)
     msg1.section = 3;
   }
   // Output images viewed by the turtlebot
-  cv::namedWindow("Robot View");
-  cv::imshow("Robot View", input);
+  // cv::namedWindow("Robot View", cv::WINDOW_NORMAL | cv::WINDOW_KEEPRATIO);
+  // cv::resizeWindow("Robot View", 640, 360);
+  // cv::imshow("Robot View", input);
+}
+
+void imageCallback(const sensor_msgs::ImageConstPtr& msg)
+{
+  cv_bridge::CvImagePtr cv_ptr;
+  static cv::Mat img, img_filt;
+  try
+  {
+    cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+    img = cv_ptr->image;
+    // cv::waitKey(30);
+
+    // Perform image processing
+    img_filt = Gauss(img);
+    colorthresh(img_filt);
+    // Publish direction message
+    dirPub.publish(msg1);
+  }
+  catch (cv_bridge::Exception& e)
+  {
+    ROS_ERROR("Could not convert from '%s' to 'bgr8'.", msg->encoding.c_str());
+  }
 }
 
 int main(int argc, char** argv)
@@ -139,20 +147,9 @@ int main(int argc, char** argv)
   // Creating Publisher and subscriber
   ros::Subscriber sub = n.subscribe("/camera2/rgb/image_raw2", 1, imageCallback);
 
-  ros::Publisher dirPub = n.advertise<core_msgs::line_info>("/line_section", 1);
+  dirPub = n.advertise<core_msgs::line_info>("/line_section", 1);
 
-  while (ros::ok())
-  {
-    if (!img.empty())
-    {
-      // Perform image processing
-      img_filt = Gauss(img);
-      colorthresh(img_filt);
-      // Publish direction message
-      dirPub.publish(msg1);
-    }
-    ros::spinOnce();
-  }
+  ros::spin();
   // Closing image viewer
-  cv::destroyWindow("Robot View");
+  // cv::destroyWindow("Robot View");
 }
