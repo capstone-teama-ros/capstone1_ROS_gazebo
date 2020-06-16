@@ -9,6 +9,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/viz.hpp>
+#include <sstream>
 
 // Setting Thresholds for red and blue part of image.
 // Changable to fit your enviroment. If you want to use bgr, it should be different.
@@ -30,6 +31,13 @@ struct BallDetectData
   std::vector<std::vector<cv::Point> > contours;
   std::vector<cv::Point2f> centers;
   std::vector<float> radii;
+};
+
+struct AllBallData
+{
+  BallDetectData red_data;
+  BallDetectData blue_data;
+  BallDetectData green_data;
 };
 
 // Initialization of variable for camera calibration paramters.
@@ -95,9 +103,9 @@ BallDetectData extractBall(cv::Mat& hsv_frame, int low_threshold, int ratio, int
   return data;
 }
 // Declaration of functions that calculates the ball position from pixel position.
-std::vector<float> pixel2point(cv::Point center, int radius)
+cv::Point3f pixel2point(cv::Point center, int radius)
 {
-  std::vector<float> position;
+  cv::Point3f position;
   float x, y, u, v, Xc, Yc, Zc;
   x = center.x;  //.x;// .at(0);
   y = center.y;  //.y;//
@@ -106,74 +114,92 @@ std::vector<float> pixel2point(cv::Point center, int radius)
   Zc = (intrinsic_data[0] * fball_diameter) / (2 * (float)radius);
   Xc = u * Zc;
   Yc = v * Zc;
-  Xc = std::roundf(Xc * 1000) / 1000;
-  Yc = std::roundf(Yc * 1000) / 1000;
-  Zc = std::roundf(Zc * 1000) / 1000;
-  position.push_back(Xc);
-  position.push_back(Yc);
-  position.push_back(Zc);
+  position.x = std::roundf(Xc * 1000) / 1000;
+  position.y = std::roundf(Yc * 1000) / 1000;
+  position.z = std::roundf(Zc * 1000) / 1000;
   return position;
 }
 
-void addBallData(decltype(core_msgs::ball_position::blue_balls)* ball_data, const BallDetectData& data,
-                 const cv::Scalar& ball_color, cv::Mat* result)
+using BallList = decltype(core_msgs::ball_position::blue_balls);
+BallList makeBallList(const BallDetectData& data)
 {
+  BallList ball_list;
+
   for (size_t i = 0; i < data.contours.size(); i++)
   {
     if (data.hierarchy[i][3] == -1 && data.radii[i] > iMin_tracking_ball_size)
     {
       // find the pixel point of the circle cneter, and the pixel radius of an circle
-
       float px = data.centers[i].x;
       float py = data.centers[i].y;
       float pr = data.radii[i];
 
       // change the pixel value to real world value
-
-      std::vector<float> ball_pos = pixel2point(data.centers[i], data.radii[i]);
-
-      // draw the circle at the result cv::Mat matrix
-      // putText puts text at the matrix, puts text, at the point of an image
-
-      float isx = ball_pos[0];
-      float isy = ball_pos[1];
-      float isz = ball_pos[2];
-
-      std::string sx = std::to_string(isx);
-      std::string sy = std::to_string(isy);
-      std::string sz = std::to_string(isz);
-
-      std::string text = "x: " + sx + ", y: " + sy + ", z: " + sz;
-      cv::Scalar text_color = cv::Scalar(0, 255, 0);  // (blue, green, red)
-      putText(*result, text, data.centers[i], 2, 1, text_color, 2);
-      circle(*result, data.centers[i], static_cast<int>(data.radii[i]), ball_color, 2, 8, 0);
+      auto ball_pos = pixel2point(data.centers[i], data.radii[i]);
 
       // push back variables of real ball position to the message variable
-      ball_data->emplace_back();
-      auto& new_ball = ball_data->back();
-      new_ball.x = ball_pos[0];
-      new_ball.y = ball_pos[1];
-      new_ball.z = ball_pos[2];
+      ball_list.emplace_back();
+      auto& new_ball = ball_list.back();
+      new_ball.x = ball_pos.x;
+      new_ball.y = ball_pos.y;
+      new_ball.z = ball_pos.z;
+    }
+  }
+
+  return ball_list;
+}
+
+/**
+ * @param result  그림을 그릴 이미지
+ * @param data    데이터
+ * @param ball_color 공 주위에 그릴 원의 색깔
+ */
+void drawBallData(cv::Mat* result, const BallDetectData& data, const cv::Scalar& ball_color)
+{
+  const cv::Scalar TEXT_COLOR = cv::Scalar(0, 255, 0);  // (blue, green, red)
+
+  for (size_t i = 0; i < data.contours.size(); i++)
+  {
+    if (data.hierarchy[i][3] == -1 && data.radii[i] > iMin_tracking_ball_size)
+    {
+      float px = data.centers[i].x;
+      float py = data.centers[i].y;
+      float pr = data.radii[i];
+      auto ball_pos = pixel2point(data.centers[i], data.radii[i]);
+
+      std::ostringstream oss;
+      oss << "x: " << ball_pos.x << ", y: " << ball_pos.y << ", z: " << ball_pos.z;
+      cv::putText(*result, oss.str(), data.centers[i], 2, 1, TEXT_COLOR, 2);
+      cv::circle(*result, data.centers[i], static_cast<int>(data.radii[i]), ball_color, 2, 8, 0);
     }
   }
 }
 
-void ball_detect(const cv::Mat& buffer)
+/**
+ * 공 탐지를 위한 전처리 작업
+ */
+cv::Mat calibrateFrame(const cv::Mat& buffer)
 {
   // Declare intrinsic and distortions by using the variable declared before.
   cv::Mat intrinsic = cv::Mat(3, 3, CV_32F, intrinsic_data);
   cv::Mat distCoeffs = cv::Mat(1, 5, CV_32F, distortion_data);
 
-  // Declare another cv::Mat variable to keep the image.
-  cv::Mat frame;
-  frame = buffer;
-
-  cv::Mat calibrated_frame;
   // Undistort frame images and save to calibrated frame.
-  cv::undistort(frame, calibrated_frame, intrinsic, distCoeffs);
+  cv::Mat calibrated_frame;
+  cv::undistort(buffer, calibrated_frame, intrinsic, distCoeffs);
 
+  return calibrated_frame;
+}
+
+/**
+ * 공 탐지 알고리즘
+ *
+ * @param rgb_frame 분석할 이미지. @c calibrateFrame() 으로 전처리된 이미지여야 합니다.
+ * @returns 분석 완료된 데이터
+ */
+AllBallData ball_detect(const cv::Mat& rgb_frame)
+{
   // Defining cv::Mat variables for Threshold images.
-
   cv::Mat hsv_frame;
   cv::Mat hsv_frame_red;
   cv::Mat hsv_frame_red1;
@@ -181,11 +207,8 @@ void ball_detect(const cv::Mat& buffer)
   cv::Mat hsv_frame_blue;
   cv::Mat hsv_frame_green;
 
-  // Making clone of original image for drawing circles.
-  cv::Mat result = calibrated_frame.clone();
-
   // Change RGB frame to HSV frame
-  cv::cvtColor(calibrated_frame, hsv_frame, cv::COLOR_BGR2HSV);
+  cv::cvtColor(rgb_frame, hsv_frame, cv::COLOR_BGR2HSV);
 
   // Threshold
   cv::inRange(hsv_frame, HSV_THRESHOLD_RED1_LOW, HSV_THRESHOLD_RED1_HIGH, hsv_frame_red1);
@@ -199,16 +222,18 @@ void ball_detect(const cv::Mat& buffer)
   int ratio = 3;
   int kernel_size = 3;
 
-  BallDetectData data_r = extractBall(hsv_frame_red, lowThreshold, ratio, kernel_size);
-  BallDetectData data_b = extractBall(hsv_frame_blue, lowThreshold, ratio, kernel_size);
-  BallDetectData data_g = extractBall(hsv_frame_green, lowThreshold, ratio, kernel_size);
+  AllBallData data = {
+    extractBall(hsv_frame_red, lowThreshold, ratio, kernel_size),
+    extractBall(hsv_frame_blue, lowThreshold, ratio, kernel_size),
+    extractBall(hsv_frame_green, lowThreshold, ratio, kernel_size),
+  };
 
   // Declare message variable to publish
   core_msgs::ball_position msg;
 
-  addBallData(&msg.red_balls, data_r, cv::viz::Color::red(), &result);
-  addBallData(&msg.blue_balls, data_b, cv::viz::Color::blue(), &result);
-  addBallData(&msg.green_balls, data_g, cv::viz::Color::green(), &result);
+  msg.red_balls = makeBallList(data.red_data);
+  msg.blue_balls = makeBallList(data.red_data);
+  msg.green_balls = makeBallList(data.red_data);
 
   // show what is published at the terminal
   ROS_INFO("blue: %lu", msg.blue_balls.size());
@@ -228,7 +253,7 @@ void ball_detect(const cv::Mat& buffer)
   }
 
   pub.publish(msg);  // publish a message
-  cv::imshow("result", result);
+  return data;       // 디버그할 때 이미지 그리는 용도
 }
 
 void ball_check(const cv::Mat& buffer2)
@@ -259,7 +284,16 @@ void imageCallback1(const sensor_msgs::ImageConstPtr& msg)
   {
     ROS_ERROR("Could not convert from '%s' to 'bgr8'.", msg->encoding.c_str());
   }
-  ball_detect(buffer);
+
+  cv::Mat calibrated_frame = calibrateFrame(buffer);
+  cv::Mat result = calibrated_frame.clone();  // 결과물 그리는 용도
+  auto data = ball_detect(calibrated_frame);
+
+  drawBallData(&result, data.red_data, cv::viz::Color::red());
+  drawBallData(&result, data.blue_data, cv::viz::Color::blue());
+  drawBallData(&result, data.green_data, cv::viz::Color::green());
+  cv::imshow("result", result);
+
   cv::waitKey(1);
 }
 
