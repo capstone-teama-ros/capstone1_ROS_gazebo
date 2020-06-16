@@ -53,6 +53,43 @@ void morphOps(cv::Mat& thresh)
   cv::morphologyEx(thresh, thresh, cv::MORPH_OPEN, erodeElement);
 }
 
+void extractBall(cv::Mat& hsv_frame, int low_threshold, int ratio, int kernel_size, std::vector<cv::Vec4i>* hierarchy,
+                 std::vector<std::vector<cv::Point> >* contours, std::vector<cv::Point2f>* centers,
+                 std::vector<float>* radii)
+{
+  cv::Mat hsv_frame_1, hsv_frame_2;
+
+  // Blur and erode, dilate
+  cv::Mat erodeElement = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
+  cv::morphologyEx(hsv_frame, hsv_frame_1, cv::MORPH_CLOSE, erodeElement);
+  cv::morphologyEx(hsv_frame_1, hsv_frame_2, cv::MORPH_OPEN, erodeElement);
+  cv::GaussianBlur(hsv_frame_2, hsv_frame, cv::Size(9, 9), 2, 2);
+
+  // Canny Edge Detection
+  cv::Mat img_canny;
+  cv::Canny(hsv_frame, img_canny, low_threshold, low_threshold * ratio, kernel_size);
+
+  // Finding Contours for blue threshold image
+  hierarchy->clear();
+  contours->clear();
+  cv::findContours(img_canny, *contours, *hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
+
+  // Define variables for contour poly, center of circles, radius of circles
+  std::vector<std::vector<cv::Point> > contours_poly(contours->size());
+  centers->clear();
+  centers->resize(contours->size());
+  radii->clear();
+  radii->resize(contours->size());
+
+  // Finding balls by contours
+  // Find polygon from contours and find the minimun size enclosing circle of that polygon.
+  for (size_t i = 0; i < contours->size(); i++)
+  {
+    cv::approxPolyDP(contours->at(i), contours_poly[i], 1, true);
+    cv::minEnclosingCircle(contours_poly[i], centers->at(i), radii->at(i));
+  }
+}
+
 // Declaration of functions that calculates the ball position from pixel position.
 std::vector<float> pixel2point(cv::Point center, int radius)
 {
@@ -110,96 +147,25 @@ void ball_detect()
   cv::inRange(hsv_frame, HSV_THRESHOLD_GREEN_LOW, HSV_THRESHOLD_GREEN_HIGH, hsv_frame_green);
   cv::addWeighted(hsv_frame_red1, 1.0, hsv_frame_red2, 1.0, 0.0, hsv_frame_red);
 
-  // Blur and erode, dilate
-  cv::Mat erodeElement = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
-  cv::Mat hsv_frame_red_1, hsv_frame_red_2, hsv_frame_blue_1, hsv_frame_blue_2, hsv_frame_green_1, hsv_frame_green_2;
-
-  cv::morphologyEx(hsv_frame_red, hsv_frame_red_1, cv::MORPH_CLOSE, erodeElement);
-  cv::morphologyEx(hsv_frame_red_1, hsv_frame_red_2, cv::MORPH_OPEN, erodeElement);
-  cv::GaussianBlur(hsv_frame_red_2, hsv_frame_red, cv::Size(9, 9), 2, 2);
-
-  cv::morphologyEx(hsv_frame_blue, hsv_frame_blue_1, cv::MORPH_CLOSE, erodeElement);
-  cv::morphologyEx(hsv_frame_blue_1, hsv_frame_blue_2, cv::MORPH_OPEN, erodeElement);
-  cv::GaussianBlur(hsv_frame_blue_2, hsv_frame_blue, cv::Size(9, 9), 2, 2);
-
-  cv::morphologyEx(hsv_frame_green, hsv_frame_green_1, cv::MORPH_CLOSE, erodeElement);
-  cv::morphologyEx(hsv_frame_green_1, hsv_frame_green_2, cv::MORPH_OPEN, erodeElement);
-  cv::GaussianBlur(hsv_frame_green_2, hsv_frame_green, cv::Size(9, 9), 2, 2);
-
   // Canny Edge Detection
   int lowThreshold = 100;
   int ratio = 3;
   int kernel_size = 3;
 
-  cv::Mat img_canny_blue;
-  cv::Mat img_canny_red;
-  cv::Mat img_canny_green;
+  std::vector<cv::Vec4i> hierarchy_r, hierarchy_b, hierarchy_g;
+  std::vector<std::vector<cv::Point> > contours_r, contours_b, contours_g;
+  std::vector<cv::Point2f> center_r, center_b, center_g;
+  std::vector<float> radius_r, radius_b, radius_g;
 
-  cv::Canny(hsv_frame_blue, img_canny_blue, lowThreshold, lowThreshold * ratio, kernel_size);
-  cv::Canny(hsv_frame_red, img_canny_red, lowThreshold, lowThreshold * ratio, kernel_size);
-  cv::Canny(hsv_frame_green, img_canny_green, lowThreshold, lowThreshold * ratio, kernel_size);
-  // Finding Contours for blue threshold image
-  std::vector<cv::Vec4i> hierarchy_b;
-  std::vector<std::vector<cv::Point> > contours_b;
-  cv::findContours(img_canny_blue, contours_b, hierarchy_b, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
-
-  std::vector<cv::Vec4i> hierarchy_r;
-  std::vector<std::vector<cv::Point> > contours_r;
-  cv::findContours(img_canny_red, contours_r, hierarchy_r, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
-
-  std::vector<cv::Vec4i> hierarchy_g;
-  std::vector<std::vector<cv::Point> > contours_g;
-  cv::findContours(img_canny_green, contours_g, hierarchy_g, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
-
-  // Define variables for contour poly, center of circles, radius of circles
-  std::vector<std::vector<cv::Point> > contours_poly_b(contours_b.size());
-  std::vector<cv::Point2f> center_b(contours_b.size());
-  std::vector<float> radius_b(contours_b.size());
-
-  std::vector<std::vector<cv::Point> > contours_poly_r(contours_r.size());
-  std::vector<cv::Point2f> center_r(contours_r.size());
-  std::vector<float> radius_r(contours_r.size());
-
-  std::vector<std::vector<cv::Point> > contours_poly_g(contours_g.size());
-  std::vector<cv::Point2f> center_g(contours_g.size());
-  std::vector<float> radius_g(contours_g.size());
-
-  /*Finding blue balls by contours
-    Find polygon from contours and find the minimun size enclosing circle of that polygon.
-  */
-
-  for (size_t i = 0; i < contours_b.size(); i++)
-  {
-    cv::approxPolyDP(contours_b[i], contours_poly_b[i], 1, true);
-    cv::minEnclosingCircle(contours_poly_b[i], center_b[i], radius_b[i]);
-  }
-
-  for (size_t i = 0; i < contours_r.size(); i++)
-  {
-    cv::approxPolyDP(contours_r[i], contours_poly_r[i], 1, true);
-    cv::minEnclosingCircle(contours_poly_r[i], center_r[i], radius_r[i]);
-  }
-
-  for (size_t i = 0; i < contours_g.size(); i++)
-  {
-    cv::approxPolyDP(contours_g[i], contours_poly_g[i], 1, true);
-    cv::minEnclosingCircle(contours_poly_g[i], center_g[i], radius_g[i]);
-  }
+  extractBall(hsv_frame_red, lowThreshold, ratio, kernel_size, &hierarchy_r, &contours_r, &center_r, &radius_r);
+  extractBall(hsv_frame_blue, lowThreshold, ratio, kernel_size, &hierarchy_b, &contours_b, &center_b, &radius_b);
+  extractBall(hsv_frame_green, lowThreshold, ratio, kernel_size, &hierarchy_g, &contours_g, &center_g, &radius_g);
 
   // Declare message variable to publish
   core_msgs::ball_position msg;
   int bball_num = 0;
   int rball_num = 0;
   int gball_num = 0;
-  //  for( size_t i = 0; i < contours_b.size(); i++ ){
-  //    std::cout<<hierarchy_b[i]<<std::endl;
-  //  }
-  //  for( size_t i = 0; i < contours_r.size(); i++ ){
-  //    std::cout<<hierarchy_r[i]<<std::endl;
-  //  }
-  //  for( size_t i = 0; i < contours_g.size(); i++ ){
-  //    std::cout<<hierarchy_g[i]<<std::endl;
-  //  }
 
   for (size_t i = 0; i < contours_b.size(); i++)
   {
