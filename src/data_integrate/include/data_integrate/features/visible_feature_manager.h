@@ -153,6 +153,22 @@ public:
   }
 
   /**
+   * @returns 라인트레이서: 이미지의 전체 너비 (픽셀)
+   */
+  int getTracerImageWidth() const
+  {
+    return line_tracer_box_width_;
+  }
+
+  /**
+   * @returns 라인트레이서: 이미지의 전체 높이 (픽셀)
+   */
+  int getTracerImageHeight() const
+  {
+    return line_tracer_box_height_;
+  }
+
+  /**
    * 기억 중인 모든 feature 정보를 지웁니다.
    */
   void clearAllFeatures();
@@ -170,6 +186,8 @@ private:
   int line_tracer_box_y_;
   int line_tracer_box_width_;
   int line_tracer_box_height_;
+  int line_tracer_image_width_;
+  int line_tracer_image_height_;
 };
 
 #endif  // DATA_INTEGRATE_FEATURES_VISIBLE_FEATURE_MANAGER_H

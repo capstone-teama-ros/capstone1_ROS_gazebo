@@ -43,7 +43,10 @@ void colorthresh(cv::Mat input)
   std::vector<std::vector<cv::Point> > v;
   auto w = s.width;
   auto h = s.height;
+  msg1.image_width = s.width;
+  msg1.image_height = s.height;
   auto c_x = 0.0;
+
   // Detect all objects within the HSV range
   //  cv::Mat img_hsv;
   //  cv::cvtColor(input, img_hsv, CV_BGR2HSV);

@@ -257,4 +257,6 @@ void VisibleFeatureManager::subscribeToLineInfo(const core_msgs::line_info::Cons
   line_tracer_box_y_ = msg->y;
   line_tracer_box_width_ = msg->w;
   line_tracer_box_height_ = msg->h;
+  line_tracer_image_width_ = msg->image_width;
+  line_tracer_image_height_ = msg->image_height;
 }

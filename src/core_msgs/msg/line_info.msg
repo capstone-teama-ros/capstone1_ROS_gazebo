@@ -13,3 +13,7 @@ int32 x
 int32 y
 int32 w
 int32 h
+
+# 이미지의 전체 크기 (직사각형의 상대적 위치를 파악하기 위해 필요합니다)
+int32 image_width
+int32 image_height
