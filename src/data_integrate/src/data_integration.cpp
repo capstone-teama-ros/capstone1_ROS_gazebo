@@ -26,11 +26,15 @@ int main(int argc, char** argv)
 
   ros::Publisher fl_wheel = n.advertise<std_msgs::Float64>("/myrobot/FLwheel_velocity_controller/command", 10);
   ros::Publisher fr_wheel = n.advertise<std_msgs::Float64>("/myrobot/FRwheel_velocity_controller/command", 10);
+  ros::Publisher bl_wheel = n.advertise<std_msgs::Float64>("/myrobot/BLwheel_velocity_controller/command", 10);
+  ros::Publisher br_wheel = n.advertise<std_msgs::Float64>("/myrobot/BRwheel_velocity_controller/command", 10);
+
   ros::Publisher fl_publish = n.advertise<std_msgs::Float64>("myrobot/FLsuspension_position_controller/command", 10);
   ros::Publisher fr_publish = n.advertise<std_msgs::Float64>("/myrobot/FRsuspension_position_controller/command", 10);
-  ros::Publisher cs_publish = n.advertise<std_msgs::Float64>("/myrobot/CSsuspension_position_controller/command", 10);
+  ros::Publisher bl_publish = n.advertise<std_msgs::Float64>("/myrobot/BLsuspension_position_controller/command", 10);
+  ros::Publisher br_publish = n.advertise<std_msgs::Float64>("/myrobot/BRsuspension_position_controller/command", 10);
 
-  SimpleWheelController wheel_controller(fl_wheel, fr_wheel);
+  SimpleWheelController wheel_controller(fl_wheel, fr_wheel, bl_wheel, br_wheel);
   Blackboard blackboard(visible_features, wheel_controller);
   TaskExecutor task_executor(blackboard);
 
@@ -40,15 +44,18 @@ int main(int argc, char** argv)
   {
     std_msgs::Float64 FL_position_msg;
     std_msgs::Float64 FR_position_msg;
-    std_msgs::Float64 CS_position_msg;
+    std_msgs::Float64 BL_position_msg;
+    std_msgs::Float64 BR_position_msg;
 
-    FL_position_msg.data = 0.0;
-    FR_position_msg.data = 0.0;
-    CS_position_msg.data = 0.0;
+    FL_position_msg.data = 0.0125;
+    FR_position_msg.data = 0.0125;
+    BL_position_msg.data = 0.0125;
+    BR_position_msg.data = 0.0125;
 
     fl_publish.publish(FL_position_msg);
     fr_publish.publish(FR_position_msg);
-    cs_publish.publish(CS_position_msg);
+    bl_publish.publish(BL_position_msg);
+    br_publish.publish(BR_position_msg);
 
     // TODO 더 정확한 시간을 사용하기
     task_executor.runTaskInLoop(sleep_duration.toSec(), sleep_duration.toSec());
