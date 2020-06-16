@@ -297,8 +297,7 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "ball_detect_node");  // init ros nodd
   ros::NodeHandle nh;                         // create node handler
   image_transport::ImageTransport it(nh);     // create image transport and connect it to node hnalder
-  image_transport::Subscriber sub1 = it.subscribe(
-      "/camera/rgb/image_raw", 1, imageCallback1);  //카메라 패키지의 이름을 변경할 수 있다고 가정하고 작성함
+  image_transport::Subscriber sub1 = it.subscribe("/camera/rgb/image_raw", 1, imageCallback1);
   image_transport::Subscriber sub2 = it.subscribe("/camera2/rgb/image_raw2", 1, imageCallback2);
   pub = nh.advertise<core_msgs::ball_position>("/position", 1);  // setting publisher
   pub1 = nh.advertise<core_msgs::ball_ch>("/ball_ch", 1);        // setting publisher
