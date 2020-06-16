@@ -150,7 +150,7 @@ void addBallData(decltype(core_msgs::ball_position::blue_balls)* ball_data, cons
 
       // push back variables of real ball position to the message variable
       ball_data->emplace_back();
-      auto new_ball = ball_data->back();
+      auto& new_ball = ball_data->back();
       new_ball.x = ball_pos[0];
       new_ball.y = ball_pos[1];
       new_ball.z = ball_pos[2];
