@@ -3,12 +3,12 @@
 #include <angles/angles.h>
 #include <ros/ros.h>
 #include "data_integrate/tasks/approach_blue_ball.h"
+#include "data_integrate/tasks/avoid_obstacles_to_ball.h"
 #include "data_integrate/tasks/finish_capture_blue_ball.h"
-#include "data_integrate/tasks/turn_to_nearest_ball.h"
 
 BlueBallCaptureTask::BlueBallCaptureTask()
 {
-  subtasks_.push_back(TaskPtr(new TurnToNearestBall(BallColor::Blue)));
+  subtasks_.push_back(TaskPtr(new AvoidObstaclesToBall(BallColor::Blue)));
   subtasks_.push_back(TaskPtr(new ApproachBlueBall()));
   subtasks_.push_back(TaskPtr(new FinishCaptureBlueBall()));
 
