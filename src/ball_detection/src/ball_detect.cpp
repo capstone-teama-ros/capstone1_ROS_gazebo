@@ -236,22 +236,32 @@ void ball_check(const cv::Mat& buffer2)
   const int low_b_b = 60, high_g_b = 30, high_r_b = 30;
   core_msgs::ball_ch msg;
 
-  auto value = buffer2.at<cv::Vec3b>(320, 240);
-  ROS_DEBUG("%d, %d, %d", value[0], value[1], value[2]);
+  std::vector<cv::Vec3b> points;
+  int buf_width = buffer2.size().width;
+  int buf_height = buffer2.size().height;
 
-  //두번째 카메라에서 (320,240)의 b값이 최소값보다 큰지 확인한건데 원하는 위치에 맞게 조정 및 파란색만 잘 확인 될지
-  if (value[0] > low_b_b && value[1] < high_g_b && value[2] < high_r_b)
+  // Check multiple points because the center does not always work
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height / 2, buf_width / 2));              // center
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height * 3 / 4, buf_width / 2));          // below center
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height * 15 / 16, buf_width / 2));        // bottom center
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height * 15 / 16, buf_width / 32));       // bottom left
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height * 15 / 16, buf_width * 15 / 16));  // bottom right
+
+  msg.still_blue = 0;
+  for (auto& point : points)
   {
-    msg.still_blue = 1;
+    ROS_DEBUG("%d, %d, %d", point[0], point[1], point[2]);
+    if (point[0] > low_b_b && point[1] < high_g_b && point[2] < high_r_b)
+    {
+      msg.still_blue = 1;
+      break;
+    }
   }
-  else
-  {
-    msg.still_blue = 0;
-  }
+
   pub1.publish(msg);  // publish a message
-  // cv::Mat result_shown;
-  // cv::resize(buffer2, result_shown, cv::Size(), 0.5, 0.5);
-  // cv::imshow("lower cam", result_shown);
+  cv::Mat result_shown;
+  cv::resize(buffer2, result_shown, cv::Size(), 0.5, 0.5);
+  cv::imshow("lower cam", result_shown);
 }
 
 void imageCallback1(const sensor_msgs::ImageConstPtr& msg)
