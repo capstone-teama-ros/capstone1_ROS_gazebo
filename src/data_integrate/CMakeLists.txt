@@ -58,6 +58,7 @@ add_library(${PROJECT_NAME}_tasks_lib
   src/tasks/blue_ball_capture_task.cpp
   src/tasks/blue_ball_return_task.cpp
   src/tasks/blue_ball_search_task.cpp
+  src/tasks/finish_capture_blue_ball.cpp
   src/tasks/goal_post_search_task.cpp
   src/tasks/line_tracer.cpp
   src/tasks/move_distance.cpp
