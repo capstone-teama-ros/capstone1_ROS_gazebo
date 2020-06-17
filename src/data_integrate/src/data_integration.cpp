@@ -1,10 +1,12 @@
 #include <core_msgs/ball_position.h>
+#include <core_msgs/line_info.h>
 #include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/LaserScan.h>
 #include <std_msgs/Float64.h>
 
 #include "data_integrate/blackboard.h"
+#include "data_integrate/direct_wheel_controller.h"
 #include "data_integrate/features/visible_feature_manager.h"
 #include "data_integrate/simple_wheel_controller.h"
 #include "data_integrate/task_executor.h"
@@ -20,7 +22,8 @@ int main(int argc, char** argv)
       n.subscribe<sensor_msgs::LaserScan>("/scan", 1000, &VisibleFeatureManager::subscribeToLidar, &visible_features);
   ros::Subscriber sub_ball_harvest = n.subscribe<core_msgs::ball_position>(
       "/position", 1000, &VisibleFeatureManager::subscribeToCamera, &visible_features);
-  // ros::Subscriber sub_line_tracing = n.subscribe<core_msgs::line_info>("/line_info", 1000, camera_Callback_2);
+  ros::Subscriber sub_line_tracing = n.subscribe<core_msgs::line_info>(
+      "/line_info", 1000, &VisibleFeatureManager::subscribeToLineInfo, &visible_features);
   ros::Subscriber sub_imu =
       n.subscribe<sensor_msgs::Imu>("/imu", 1000, &VisibleFeatureManager::subscribeToImu, &visible_features);
 
@@ -35,7 +38,8 @@ int main(int argc, char** argv)
   ros::Publisher br_publish = n.advertise<std_msgs::Float64>("/myrobot/BRsuspension_position_controller/command", 10);
 
   SimpleWheelController wheel_controller(fl_wheel, fr_wheel, bl_wheel, br_wheel);
-  Blackboard blackboard(visible_features, wheel_controller);
+  DirectWheelController direct_controller(fl_wheel, fr_wheel, bl_wheel, br_wheel);
+  Blackboard blackboard(visible_features, wheel_controller, direct_controller);
   TaskExecutor task_executor(blackboard);
 
   ros::Duration sleep_duration(0.025);

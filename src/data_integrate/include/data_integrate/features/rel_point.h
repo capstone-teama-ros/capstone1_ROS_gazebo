@@ -56,6 +56,11 @@ public:
     return angle_;
   }
 
+  /**
+   * 이 점과 다른 점 사이의 거리를 구합니다.
+   */
+  double getDistanceTo(const RelPoint &other) const;
+
 private:
   /**
    * 다른 생성자에서 호출하기 위한 용도로 만든 생성자입니다.

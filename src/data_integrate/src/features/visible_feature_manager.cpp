@@ -5,6 +5,14 @@
 #include <limits>
 #include <vector>
 
+const VisibleFeatureManager::BallCollection& VisibleFeatureManager::getBalls(BallColor color) const
+{
+  VisibleFeatureManager::BallCollection color_balls;
+  std::copy_if(balls_.begin(), balls_.end(), color_balls.begin(),
+               [=](const Ball& ball) { return ball.getColor() == color; });
+  return color_balls;
+}
+
 using RelPointList = std::vector<RelPoint>;
 using RelPointClusterList = std::vector<RelPointList>;
 
@@ -247,4 +255,15 @@ void VisibleFeatureManager::subscribeToImu(const sensor_msgs::Imu::ConstPtr& msg
   // 주의: 창시구 규정에 의해 orientation은 사용 금지됨
   imu_angular_velocity_ = msg->angular_velocity;
   imu_linear_acceleration_ = msg->linear_acceleration;
+}
+
+void VisibleFeatureManager::subscribeToLineInfo(const core_msgs::line_info::ConstPtr& msg)
+{
+  line_tracer_section_ = msg->section;
+  line_tracer_box_x_ = msg->x;
+  line_tracer_box_y_ = msg->y;
+  line_tracer_box_width_ = msg->w;
+  line_tracer_box_height_ = msg->h;
+  line_tracer_image_width_ = msg->image_width;
+  line_tracer_image_height_ = msg->image_height;
 }
