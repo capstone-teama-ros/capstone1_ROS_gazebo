@@ -227,8 +227,10 @@ void ball_detect(const cv::Mat& buffer)
     ROS_INFO("  x = %.4f, y = %.4f, z = %.4f", ball_pos.x, ball_pos.y, ball_pos.z);
   }
 
-  pub.publish(msg);  // publish a message
-  cv::imshow("result", result);
+  pub.publish(msg);      // publish a message
+  cv::Mat result_shown;  // actual matrix shown
+  cv::resize(result, result_shown, cv::Size(), 0.5, 0.5);
+  cv::imshow("result", result_shown);
 }
 
 void ball_check(const cv::Mat& buffer2)
