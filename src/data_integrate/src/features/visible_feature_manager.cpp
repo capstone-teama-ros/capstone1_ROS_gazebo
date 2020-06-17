@@ -15,6 +15,7 @@ VisibleFeatureManager::BallCollection VisibleFeatureManager::getBalls(BallColor 
   return color_balls;
 }
 
+using ColumnList = VisibleFeatureManager::ColumnList;
 using RelPointList = std::vector<RelPoint>;
 using RelPointClusterList = std::vector<RelPointList>;
 
@@ -156,8 +157,8 @@ Rect findBoundingBox(const RelPointList& points)
  * 클러스터의 bounding box의 너비나 높이가 이보다 크면 기둥이 아닌 벽으로 판단해 무시합니다.
  * @returns 검출한 기둥들의 좌표
  */
-RelPointList findColumns(const RelPointList& points, double threshold, size_t min_points, size_t max_points,
-                         double max_cluster_size)
+ColumnList findColumns(const RelPointList& points, double threshold, size_t min_points, size_t max_points,
+                       double max_cluster_size)
 {
   ROS_ASSERT(threshold >= 0);
   ROS_ASSERT(min_points <= max_points);
@@ -165,7 +166,7 @@ RelPointList findColumns(const RelPointList& points, double threshold, size_t mi
 
   auto clusters = clusterByNearestPointDistance(points, threshold);
 
-  RelPointList columns;
+  ColumnList columns;
   for (auto& cluster : clusters)
   {
     auto bounding_box = findBoundingBox(cluster);
@@ -173,7 +174,8 @@ RelPointList findColumns(const RelPointList& points, double threshold, size_t mi
     if (min_points <= cluster.size() && cluster.size() <= max_points && bounding_box.width <= max_cluster_size &&
         bounding_box.height <= max_cluster_size)
     {
-      columns.emplace_back(computeAveragePoint(cluster));
+      auto avg_point = computeAveragePoint(cluster);
+      columns.emplace_back(static_cast<const Feature&>(avg_point));
     }
   }
 

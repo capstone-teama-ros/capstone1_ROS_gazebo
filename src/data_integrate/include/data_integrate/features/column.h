@@ -19,6 +19,13 @@ public:
   }
 
   /**
+   * @param feature Feature to copy position data from.
+   */
+  Column(const Feature& feature) : Feature(feature)
+  {
+  }
+
+  /**
    * Creates a column using x, y coordinates on the robot frame.
    *
    * @param rel_x x (meters)
