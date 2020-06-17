@@ -1,14 +1,16 @@
 #include "data_integrate/features/visible_feature_manager.h"
 
 #include <ros/ros.h>
+#include <algorithm>
 #include <cmath>
+#include <iterator>
 #include <limits>
 #include <vector>
 
-const VisibleFeatureManager::BallCollection& VisibleFeatureManager::getBalls(BallColor color) const
+VisibleFeatureManager::BallCollection VisibleFeatureManager::getBalls(BallColor color) const
 {
   VisibleFeatureManager::BallCollection color_balls;
-  std::copy_if(balls_.begin(), balls_.end(), color_balls.begin(),
+  std::copy_if(balls_.begin(), balls_.end(), std::back_inserter(color_balls),
                [=](const Ball& ball) { return ball.getColor() == color; });
   return color_balls;
 }
