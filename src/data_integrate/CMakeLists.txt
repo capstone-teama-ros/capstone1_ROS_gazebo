@@ -65,6 +65,7 @@ add_library(${PROJECT_NAME}_tasks_lib
   src/tasks/periodic_search_move_repeat.cpp
   src/tasks/task.cpp
   src/tasks/turn_angle.cpp
+  src/tasks/turn_to_nearest_blue_ball.cpp
 )
 add_dependencies(${PROJECT_NAME}_tasks_lib
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
