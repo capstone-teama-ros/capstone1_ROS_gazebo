@@ -23,6 +23,8 @@ int main(int argc, char** argv)
       n.subscribe<sensor_msgs::LaserScan>("/scan", 1000, &VisibleFeatureManager::subscribeToLidar, &visible_features);
   ros::Subscriber sub_ball_harvest = n.subscribe<core_msgs::ball_position>(
       "/position", 1000, &VisibleFeatureManager::subscribeToCamera, &visible_features);
+  ros::Subscriber lower_cam_sub = n.subscribe<core_msgs::ball_ch>(
+      "/ball_ch", 1000, &VisibleFeatureManager::subscribeToLowerCamera, &visible_features);
   ros::Subscriber sub_line_tracing = n.subscribe<core_msgs::line_info>(
       "/line_info", 1000, &VisibleFeatureManager::subscribeToLineInfo, &visible_features);
   ros::Subscriber sub_imu =

@@ -70,6 +70,9 @@ int main(int argc, char** argv)
       "/scan", 1000, &TestVisibleFeatureManager::subscribeToLidar, &test_visible_feature_manager);
   ros::Subscriber camera_sub = n.subscribe<core_msgs::ball_position>(
       "/position", 1000, &TestVisibleFeatureManager::subscribeToCamera, &test_visible_feature_manager);
+  ros::Subscriber lower_cam_sub =
+      n.subscribe<core_msgs::ball_ch>("/ball_ch", 1000, &VisibleFeatureManager::subscribeToLowerCamera,
+                                      (VisibleFeatureManager*)&test_visible_feature_manager);
 
   ROS_INFO("%s has subscribed to %s, %s", ros::this_node::getName().c_str(), lidar_sub.getTopic().c_str(),
            camera_sub.getTopic().c_str());

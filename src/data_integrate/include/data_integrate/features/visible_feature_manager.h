@@ -1,6 +1,7 @@
 #ifndef DATA_INTEGRATE_FEATURES_VISIBLE_FEATURE_MANAGER_H
 #define DATA_INTEGRATE_FEATURES_VISIBLE_FEATURE_MANAGER_H
 
+#include <core_msgs/ball_ch.h>
 #include <core_msgs/ball_position.h>
 #include <core_msgs/line_info.h>
 #include <geometry_msgs/Vector3.h>
@@ -22,6 +23,13 @@ public:
    * @param msg topic으로부터 받는 데이터 메시지
    */
   void subscribeToCamera(const core_msgs::ball_position::ConstPtr& msg);
+
+  /**
+   * Callback that receives data from the lower camera.
+   *
+   * @param msg topic으로부터 받는 데이터 메시지
+   */
+  void subscribeToLowerCamera(const core_msgs::ball_ch::ConstPtr& msg);
 
   /**
    * LIDAR topic에 subscribe하여 데이터를 받기 위한 callback입니다.
