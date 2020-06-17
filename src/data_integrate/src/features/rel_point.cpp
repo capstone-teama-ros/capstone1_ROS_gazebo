@@ -19,8 +19,7 @@ RelPoint RelPoint::fromRelXY(double rel_x, double rel_y)
   double angle = 0;  // 기본값
   if (distance > 0)
   {
-    // 0 ~ π 사이의 값을 만들기 위해 atan()이 아닌 acos()를 사용함
-    angle = std::acos(rel_y / distance);
+    angle = std::atan2(-rel_x, rel_y);
   }
 
   return RelPoint(distance, angle, rel_x, rel_y);
