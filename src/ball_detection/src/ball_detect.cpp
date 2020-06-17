@@ -22,8 +22,6 @@ const cv::Scalar HSV_THRESHOLD_BLUE_HIGH(121, 255, 255);
 const cv::Scalar HSV_THRESHOLD_GREEN_LOW(50, 126, 60);
 const cv::Scalar HSV_THRESHOLD_GREEN_HIGH(70, 255, 255);
 
-const int low_b_b = 150, high_g_b = 50, high_r_b = 50;
-
 struct BallDetectData
 {
   std::vector<cv::Vec4i> hierarchy;
@@ -235,12 +233,15 @@ void ball_detect(const cv::Mat& buffer)
 
 void ball_check(const cv::Mat& buffer2)
 {
+  const int low_b_b = 60, high_g_b = 30, high_r_b = 30;
   core_msgs::ball_ch msg;
-  //  ROS_INFO("%s", buffer2.at<cv::Vec3b>(320,240)[0].c_str());          //확인해보려고 출력해보려했는데 오류떠서
-  //  지워놨습니다.
-  if (buffer2.at<cv::Vec3b>(320, 240)[0] > low_b_b && buffer2.at<cv::Vec3b>(320, 240)[1] < high_g_b &&
-      buffer2.at<cv::Vec3b>(320, 240)[2] < high_r_b)
-  {  //두번째 카메라에서 (320,240)의 b값이 최소값보다 큰지 확인한건데 원하는 위치에 맞게 조정 및 파란색만 잘 확인 될지
+
+  auto value = buffer2.at<cv::Vec3b>(320, 240);
+  ROS_DEBUG("%d, %d, %d", value[0], value[1], value[2]);
+
+  //두번째 카메라에서 (320,240)의 b값이 최소값보다 큰지 확인한건데 원하는 위치에 맞게 조정 및 파란색만 잘 확인 될지
+  if (value[0] > low_b_b && value[1] < high_g_b && value[2] < high_r_b)
+  {
     msg.still_blue = 1;
   }
   else
@@ -248,6 +249,9 @@ void ball_check(const cv::Mat& buffer2)
     msg.still_blue = 0;
   }
   pub1.publish(msg);  // publish a message
+  // cv::Mat result_shown;
+  // cv::resize(buffer2, result_shown, cv::Size(), 0.5, 0.5);
+  // cv::imshow("lower cam", result_shown);
 }
 
 void imageCallback1(const sensor_msgs::ImageConstPtr& msg)
