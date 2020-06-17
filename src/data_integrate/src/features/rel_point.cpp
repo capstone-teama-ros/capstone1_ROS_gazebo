@@ -24,3 +24,8 @@ RelPoint RelPoint::fromRelXY(double rel_x, double rel_y)
 
   return RelPoint(distance, angle, rel_x, rel_y);
 }
+
+double RelPoint::getDistanceTo(const RelPoint &other) const
+{
+  return std::hypot(getRelX() - other.getRelX(), getRelY() - other.getRelY());
+}
