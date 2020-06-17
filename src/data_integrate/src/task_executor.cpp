@@ -10,6 +10,12 @@ void TaskExecutor::runTaskInLoop(double time_passed_after_last, double time_unti
   // 현재 작업을 업데이트합니다.
   blackboard_.setTimeSinceLastTick(time_passed_after_last);
   blackboard_.setTimeUntilNextTick(time_until_next);
+
+  // DO NOT REMOVE!
+  // Dummy method calls to prevent compiler reordering setTimeSinceLastTick()
+  blackboard_.getTimeSinceLastTick();
+  blackboard_.getTimeUntilNextTick();
+
   auto result = task_->tick(blackboard_);
 
   if (result == TaskResult::Success)
