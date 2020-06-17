@@ -1,11 +1,11 @@
-#include "data_integrate/tasks/turn_to_nearest_blue_ball.h"
+#include "data_integrate/tasks/turn_to_nearest_ball.h"
 
 #include <angles/angles.h>
 #include <ros/ros.h>
 #include <algorithm>
 #include "data_integrate/features/ball.h"
 
-TaskResult TurnToNearestBlueBall::doTick(Blackboard& blackboard)
+TaskResult TurnToNearestBall::doTick(Blackboard& blackboard)
 {
   const double MIN_TURN_SPEED = angles::from_degrees(30);  // rad/s; minimum required to overcome friction
   const double MAX_TURN_SPEED = angles::from_degrees(40);  // rad/s
@@ -18,14 +18,15 @@ TaskResult TurnToNearestBlueBall::doTick(Blackboard& blackboard)
   ROS_ASSERT_MSG(THRESHOLD >= 0, "Threshold must be 0 or greater (got %f)", THRESHOLD);
   ROS_ASSERT_MSG(FINISH_TIME >= 0, "Finish time must be 0 or greater (got %f)", FINISH_TIME);
 
-  auto blue_balls = blackboard.visible_features_.getBalls(BallColor::Blue);
+  auto target_balls = blackboard.visible_features_.getBalls(ball_color_);
 
-  auto nearest_ball = std::min_element(blue_balls.begin(), blue_balls.end(),
+  auto nearest_ball = std::min_element(target_balls.begin(), target_balls.end(),
                                        [](const Ball& a, const Ball& b) { return a.getDistance() < b.getDistance(); });
-  // 파란 공이 없으면 실패
-  if (nearest_ball == blue_balls.end())
+
+  // Fail if no target-colored balls are visible
+  if (nearest_ball == target_balls.end())
   {
-    ROS_WARN("%s: No blue ball in sight", name());
+    ROS_WARN("%s: No target-colored ball in sight", name());
     halt(blackboard);
     return TaskResult::Failure;
   }
@@ -61,7 +62,22 @@ TaskResult TurnToNearestBlueBall::doTick(Blackboard& blackboard)
   return TaskResult::Running;
 }
 
-void TurnToNearestBlueBall::doHalt(Blackboard& blackboard)
+void TurnToNearestBall::doHalt(Blackboard& blackboard)
 {
   current_finish_timer_ = 0;
+}
+
+const char* TurnToNearestBall::name() const
+{
+  switch (ball_color_)
+  {
+    case BallColor::Blue:
+      return "TurnToNearestBall[Blue]";
+    case BallColor::Red:
+      return "TurnToNearestBall[Red]";
+    case BallColor::Green:
+      return "TurnToNearestBall[Green]";
+    default:
+      ROS_ASSERT_MSG(0, "Unexpected ball color: %u", static_cast<unsigned int>(ball_color_));
+  }
 }

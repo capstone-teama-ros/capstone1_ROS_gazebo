@@ -1,19 +1,24 @@
-#ifndef DATA_INTEGRATE_TASKS_TURN_TO_NEAREST_BLUE_BALL_H
-#define DATA_INTEGRATE_TASKS_TURN_TO_NEAREST_BLUE_BALL_H
+#ifndef DATA_INTEGRATE_TASKS_TURN_TO_NEAREST_BALL_H
+#define DATA_INTEGRATE_TASKS_TURN_TO_NEAREST_BALL_H
 
-#include "../features/rel_point.h"
 #include "./task.h"
 
+#include "../features/ball.h"
+
 /**
- * 특정한 좌표를 향해 정렬하는 작업입니다.
+ * Aligns the robot's direction to the nearest ball of a specific color.
  */
-class TurnToNearestBlueBall : public Task
+class TurnToNearestBall : public Task
 {
 public:
-  const char *name() const override
+  /**
+   * @param ball_color Color of the ball to find a clear path to
+   */
+  TurnToNearestBall(BallColor ball_color) : ball_color_(ball_color)
   {
-    return "TurnToNearestBlueBall";
   }
+
+  const char *name() const override;
 
 private:
   /**
@@ -27,7 +32,8 @@ private:
 
   void doHalt(Blackboard &blackboard) override;
 
+  BallColor ball_color_;
   double current_finish_timer_ = 0;
 };
 
-#endif  // DATA_INTEGRATE_TASKS_TURN_TO_NEAREST_BLUE_BALL_H
+#endif  // DATA_INTEGRATE_TASKS_TURN_TO_NEAREST_BALL_H
