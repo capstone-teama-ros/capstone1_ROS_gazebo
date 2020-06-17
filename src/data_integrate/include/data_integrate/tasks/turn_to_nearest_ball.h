@@ -34,6 +34,7 @@ private:
 
   BallColor ball_color_;
   double current_finish_timer_ = 0;
+  bool has_been_turning_ = false;  ///< True if this task has been turning the robot. Used for deccelerating.
 };
 
 #endif  // DATA_INTEGRATE_TASKS_TURN_TO_NEAREST_BALL_H

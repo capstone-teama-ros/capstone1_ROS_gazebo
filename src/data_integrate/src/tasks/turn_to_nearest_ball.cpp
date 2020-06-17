@@ -40,16 +40,16 @@ TaskResult TurnToNearestBall::doTick(Blackboard& blackboard)
   {
     blackboard.wheel_controller_.stop();
 
-    // Wait a bit to ensure proper alignment
-    if (current_finish_timer_ >= FINISH_TIME)
+    if (has_been_turning_ && current_finish_timer_ < FINISH_TIME)
     {
-      halt(blackboard);
-      return TaskResult::Success;
+      // Wait a bit to ensure proper alignment
+      ROS_DEBUG("%s: deccelerating...", name());
+      current_finish_timer_ += blackboard.getTimeSinceLastTick();
+      return TaskResult::Running;
     }
 
-    ROS_DEBUG("%s: deccelerating...", name());
-    current_finish_timer_ += blackboard.getTimeSinceLastTick();
-    return TaskResult::Running;
+    halt(blackboard);
+    return TaskResult::Success;
   }
 
   // 알맞은 회전 속도를 계산합니다.
@@ -59,12 +59,14 @@ TaskResult TurnToNearestBall::doTick(Blackboard& blackboard)
     turn_speed = -turn_speed;
   }
   blackboard.wheel_controller_.turn(turn_speed);
+  has_been_turning_ = true;
   return TaskResult::Running;
 }
 
 void TurnToNearestBall::doHalt(Blackboard& blackboard)
 {
   current_finish_timer_ = 0;
+  has_been_turning_ = false;
 }
 
 const char* TurnToNearestBall::name() const
