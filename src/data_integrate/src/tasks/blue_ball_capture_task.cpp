@@ -6,10 +6,7 @@
 
 BlueBallCaptureTask::BlueBallCaptureTask()
 {
-  const double MAX_TURN_SPEED = angles::from_degrees(30);
-  const double THRESHOLD = angles::from_degrees(0.5);
-
-  subtasks_.push_back(TaskPtr(new TurnToNearestBlueBall(MAX_TURN_SPEED, THRESHOLD)));
+  subtasks_.push_back(TaskPtr(new TurnToNearestBlueBall()));
 
   current_subtask_ = subtasks_.begin();
 }

@@ -14,6 +14,8 @@ public:
     return "BlueBallCaptureTask";
   }
 
+  BlueBallCaptureTask();
+
 private:
   /**
    * 이 작업의 현재 상태를 업데이트합니다.
@@ -25,6 +27,9 @@ private:
   TaskResult doTick(Blackboard &blackboard) override;
 
   void doHalt(Blackboard &blackboard) override;
+
+  TaskList subtasks_;
+  TaskListIter current_subtask_;
 };
 
 #endif  // DATA_INTEGRATE_TASKS_BLUE_BALL_CAPTURE_TASK_H
