@@ -56,6 +56,11 @@ public:
   }
 
   /**
+   * 가장 최근에 카메라로 관측한 공 중에서 특정한 색깔의 공들만 가져옵니다.
+   */
+  const BallCollection& getBalls(BallColor color) const;
+
+  /**
    * 가장 최근에 LIDAR로 관측한 점의 목록을 가져옵니다.
    */
   const LidarPointCollection& getLidarPoints() const

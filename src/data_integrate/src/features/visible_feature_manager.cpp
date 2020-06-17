@@ -5,6 +5,14 @@
 #include <limits>
 #include <vector>
 
+const VisibleFeatureManager::BallCollection& VisibleFeatureManager::getBalls(BallColor color) const
+{
+  VisibleFeatureManager::BallCollection color_balls;
+  std::copy_if(balls_.begin(), balls_.end(), color_balls.begin(),
+               [=](const Ball& ball) { return ball.getColor() == color; });
+  return color_balls;
+}
+
 using RelPointList = std::vector<RelPoint>;
 using RelPointClusterList = std::vector<RelPointList>;
 
