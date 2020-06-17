@@ -4,17 +4,41 @@
 
 TaskResult GoalPostSearchTask::doTick(Blackboard &blackboard)
 {
-  // TODO 실제 코드를 추가해야 합니다
-  ROS_ASSERT_MSG(0, "Not implemented");
+  // Finish if the green ball is found
+  if (!blackboard.visible_features_.getBalls(BallColor::Green).empty())
+  {
+    ROS_INFO("%s: Found green ball", name());
+    halt(blackboard);
+    return TaskResult::Success;
+  }
 
-  // 계획 중인 상태 전환
-  // -> BlueBallSearchTask    : 파란 공을 떨어뜨렸을 경우
-  // -> BlueBallCaptureTask   : (없음)
-  // -> BlueBallDeliverTask   : ★ 골대를 찾았을 경우
+  // Abort if we lose the blue ball
+  if (!blackboard.visible_features_.isBlueBallCaptured())
+  {
+    ROS_WARN("%s: We dropped blue ball", name());
+    halt(blackboard);
+    return TaskResult::Failure;
+  }
+
+  // Keep rotating
+  auto result = turn_task_.tick(blackboard);
+  if (result == TaskResult::Success || result == TaskResult::Failure)
+  {
+    // If we reach here, it means we turned 360 degrees but couldn't find the green ball.
+    // Or the turning was interrupted for some reason.
+    ROS_ERROR("%s: Could not find green ball", name());
+    halt(blackboard);
+    return TaskResult::Failure;
+  }
+  else if (result == TaskResult::Running)
+  {
+    return TaskResult::Running;
+  }
+  else
+    ROS_INVALID_TASK_RESULT(result);
 }
 
 void GoalPostSearchTask::doHalt(Blackboard &blackboard)
 {
-  // TODO 실제 코드를 추가해야 합니다
-  ROS_ASSERT_MSG(0, "Not implemented");
+  turn_task_.halt(blackboard);
 }
