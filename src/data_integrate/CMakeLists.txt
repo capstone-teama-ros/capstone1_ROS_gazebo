@@ -43,10 +43,9 @@ include_directories(
 #### Build: Libraries ####
 
 add_library(${PROJECT_NAME}_features_lib
-  src/features/ball.cpp
+  src/features/feature.cpp
   src/features/past_ball.cpp
   src/features/past_feature_manager.cpp
-  src/features/rel_point.cpp
   src/features/visible_feature_manager.cpp
 )
 add_dependencies(${PROJECT_NAME}_features_lib
