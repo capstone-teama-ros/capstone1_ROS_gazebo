@@ -1,6 +1,13 @@
+#include <angles/angles.h>
 #include <core_msgs/ball_position.h>
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
+#include <algorithm>
+#include <cmath>
+#include <complex>
+#include <iterator>
+#include <tuple>
+#include <utility>
 
 #include "data_integrate/features/visible_feature_manager.h"
 #include "data_integrate/robot_drawing.h"
@@ -20,9 +27,21 @@ int main(int argc, char** argv)
       n.subscribe<core_msgs::ball_position>("/position", 1000, &VisibleFeatureManager::subscribeToCamera, &vfm);
 
   RobotDrawing image(600, 600, 1 / 0.015);
+  RobotDrawing abs_image(1200, 1200, 60);
   const double LIDAR_POINT_SIZE = image.toMeters(2);
   const int BALL_RADIUS = 5;
   const int ROBOT_SIZE = 10;
+
+  // auto result1 = solveOrigin(RelPoint::fromRelXY(-2, 3), 3, RelPoint::fromRelXY(-1, 3 - std::sqrt(3)), 2);
+  // ROS_INFO("%f, %f / %f, %f", result1.first.getRelX(), result1.first.getRelY(), result1.second.getRelX(),
+  //          result1.second.getRelY());
+  // auto result2 = solveOrigin(RelPoint::fromRelXY(-1, 4), 1.5, RelPoint::fromRelXY(-2, 3), 0.9);
+  // ROS_INFO("%f, %f / %f, %f", result2.first.getRelX(), result2.first.getRelY(), result2.second.getRelX(),
+  //          result2.second.getRelY());
+  // auto result3 = solveOrigin(RelPoint::fromRelXY(0.9, 1), 0.6, RelPoint::fromRelXY(0.5, 0.3), 0.9);
+  // ROS_INFO("%f, %f / %f, %f", result3.first.getRelX(), result3.first.getRelY(), result3.second.getRelX(),
+  //          result3.second.getRelY());
+  // ROS_ASSERT(0);
 
   while (ros::ok())
   {
@@ -70,7 +89,16 @@ int main(int argc, char** argv)
     // Drawing ROBOT
     image.drawMarker({ 0, 0 }, Color::yellow(), cv::MARKER_STAR, ROBOT_SIZE);
 
+    // Draw absolute points
+    abs_image.clear();
+    abs_image.circle({ 4, 0.6 }, 3, Color::red(), CV_FILLED);
+    for (auto& origin : vfm.getOrigins())
+    {
+      abs_image.drawMarker({ origin.getRelX(), origin.getRelY() }, Color::pink(), cv::MARKER_STAR, 6);
+    }
+
     // wait for a key command. if 'q' is pressed, then program will be terminated.
+    abs_image.draw("Absolute frame");
     if (image.drawAndWaitKey("Frame", 50) == 113)
     {
       break;

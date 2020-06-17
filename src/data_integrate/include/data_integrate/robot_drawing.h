@@ -84,6 +84,13 @@ public:
   }
 
   /**
+   * @c cv::imshow() 를 호출합니다.
+   *
+   * @param winname 띄울 창의 제목
+   */
+  void draw(const cv::String& winname) const;
+
+  /**
    * @c cv::imshow() 와 @c cv::waitKey() 를 순서대로 호출합니다.
    *
    * @param winname 띄울 창의 제목

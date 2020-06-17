@@ -3,6 +3,8 @@
 #include <ros/ros.h>
 #include <cmath>
 #include <limits>
+#include <tuple>
+#include <utility>
 #include <vector>
 
 using RelPointList = std::vector<RelPoint>;
@@ -163,11 +165,144 @@ RelPointList findColumns(const RelPointList& points, double threshold, size_t mi
     if (min_points <= cluster.size() && cluster.size() <= max_points && bounding_box.width <= max_cluster_size &&
         bounding_box.height <= max_cluster_size)
     {
-      columns.emplace_back(computeAveragePoint(cluster));
+      auto avg_point = computeAveragePoint(cluster);
+      columns.emplace_back(RelPoint(avg_point.getDistance() + 0.04, avg_point.getAngle()));
     }
   }
 
   return columns;
+}
+
+struct PointLine
+{
+  PointLine(const RelPoint& p1, const RelPoint& p2, double distance) : p1(p1), p2(p2), distance(distance)
+  {
+  }
+
+  PointLine(const RelPoint& p1, const RelPoint& p2) : p1(p1), p2(p2), distance(p1.getDistanceTo(p2))
+  {
+  }
+
+  RelPoint p1;
+  RelPoint p2;
+  double distance;
+};
+
+const RelPoint known_points[] = {
+  RelPoint::fromRelXY(4, 1.5),
+  RelPoint::fromRelXY(5.5, 0.7),
+  RelPoint::fromRelXY(5.5, 2.3),
+  RelPoint::fromRelXY(7, 1.5),
+};
+
+const PointLine known_lines[] = {
+  { known_points[0], known_points[1] }, { known_points[0], known_points[2] }, { known_points[0], known_points[3] },
+  { known_points[1], known_points[2] }, { known_points[1], known_points[3] }, { known_points[2], known_points[3] },
+};
+
+// a * x^2 + b * x + c = 0의 근을 구한다.
+std::pair<double, double> solveQuad(double a, double b, double c)
+{
+  double x_a = -b / 2 / a;
+  double x_d = std::sqrt(b * b / 4 - a * c) / a;
+  return { x_a + x_d, x_a - x_d };
+}
+
+std::tuple<double, double, double> findIntersectingLine(const RelPoint& p1, double r1, const RelPoint& p2, double r2)
+{
+  double x1 = p1.getRelX(), y1 = p1.getRelY();
+  double x2 = p2.getRelX(), y2 = p2.getRelY();
+  double a = 2 * (x2 - x1);
+  double b = 2 * (y2 - y1);
+  double c = (x1 * x1 - x2 * x2) + (y1 * y1 - y2 * y2) + (r2 * r2 - r1 * r1);
+  return { a, b, c };
+}
+
+std::pair<RelPoint, RelPoint> solveOrigin(const RelPoint& p1, double r1, const RelPoint& p2, double r2)
+{
+  // p1를 중심으로 하는 반지름 r1의 원 1
+  // p2를 중심으로 하는 반지름 r2의 원 2
+  // 원 1, 2의 교점을 지나는 직선 Ax + By + C = 0
+  double a, b, c;
+  std::tie(a, b, c) = findIntersectingLine(p1, r1, p2, r2);
+
+  double x1 = p1.getRelX(), y1 = p1.getRelY();
+  double x2 = p2.getRelX(), y2 = p2.getRelY();
+
+  // Ax + By + C = 0과 원 1의 두 교점을 구한다
+  // B == 0 일 경우
+  if (b == 0)
+  {
+    double x = -c / a;
+    double y_a, y_b;
+    std::tie(y_a, y_b) = solveQuad(1, -2 * y1, y1 * y1 + (x - x1) * (x - x1) - r1 * r1);
+    return { { x, y_a }, { x, y_b } };
+  }
+
+  double p = a / b;
+  double q = c / b + y1;
+
+  // Dx^2 + Ex + F = 0 의 형태로 변경
+  double d = 1 + p * p;
+  double e = 2 * p * q - 2 * x1;
+  double f = x1 * x1 + q * q - r1 * r1;
+
+  // Dx^2 + Ex + F = 0 의 근을 구한다.
+  double x_a, x_b;
+  std::tie(x_a, x_b) = solveQuad(d, e, f);
+  double y_a = -(a * x_a + c) / b;
+  double y_b = -(a * x_b + c) / b;
+  return { RelPoint::fromRelXY(x_a, y_a), RelPoint::fromRelXY(x_b, y_b) };
+}
+
+RelPointList computePossibleRobotPositions(const RelPointList& columns)
+{
+  RelPointList origins;
+
+  for (auto p1 = columns.begin(); p1 < columns.end(); ++p1)
+  {
+    for (auto p2 = std::next(p1); p2 < columns.end(); ++p2)
+    {
+      auto distance = std::hypot(p2->getRelX() - p1->getRelX(), p2->getRelY() - p1->getRelY());
+
+      for (auto& known_line : known_lines)
+      {
+        auto distance_diff = distance - known_line.distance;
+        // 허용 가능한 오차 범위
+        if (-0.08 <= distance_diff && distance_diff <= 0.05)
+        {
+          // 매칭 성공!
+          auto solutions = solveOrigin(known_line.p1, p1->getDistance(), known_line.p2, p2->getDistance());
+          origins.push_back(solutions.first);
+          origins.push_back(solutions.second);
+        }
+      }
+    }
+  }
+
+  // 보기 좋게 정렬
+  std::sort(origins.begin(), origins.end(), [](const RelPoint& p1, const RelPoint& p2) {
+    return p1.getRelX() < p1.getRelX() || p1.getRelX() == p1.getRelX() && p1.getRelY() < p1.getRelY();
+  });
+
+  ROS_INFO("From %lu columns, found %lu origins:", columns.size(), origins.size());
+  for (auto& origin : origins)
+  {
+    ROS_INFO("  %f, %f", origin.getRelX(), origin.getRelY());
+  }
+
+  //클러스터 만들기
+  auto clusters = clusterByNearestPointDistance(origins, 0.05);
+  origins.clear();
+  for (auto& cluster : clusters)
+  {
+    if (cluster.size() > 1)
+    {
+      origins.push_back(computeAveragePoint(cluster));
+    }
+  }
+
+  return origins;
 }
 
 void VisibleFeatureManager::subscribeToLidar(const sensor_msgs::LaserScan::ConstPtr& msg)
@@ -204,6 +339,8 @@ void VisibleFeatureManager::subscribeToLidar(const sensor_msgs::LaserScan::Const
   const size_t EXPECTED_COLUMN_COUNT = 4;
   ROS_WARN_COND(columns_.size() > EXPECTED_COLUMN_COUNT, "%lu columns detected (expected %lu)", columns_.size(),
                 EXPECTED_COLUMN_COUNT);
+
+  origins_ = computePossibleRobotPositions(columns_);
 }
 
 void VisibleFeatureManager::subscribeToCamera(const core_msgs::ball_position::ConstPtr& msg)

@@ -24,9 +24,14 @@ void RobotDrawing::rectangle(cv::Point2d pt1, cv::Point2d pt2, const cv::Scalar&
   cv::rectangle(image_, fromRobotFrame(pt1), fromRobotFrame(pt2), color, thickness, lineType);
 }
 
-int RobotDrawing::drawAndWaitKey(const cv::String& winname, int delay) const
+void RobotDrawing::draw(const cv::String& winname) const
 {
   cv::imshow(winname, image_);
+}
+
+int RobotDrawing::drawAndWaitKey(const cv::String& winname, int delay) const
+{
+  draw(winname);
   int key = cv::waitKey(delay);
   ROS_DEBUG("%s received key code: %d", winname.c_str(), key);
   return key;

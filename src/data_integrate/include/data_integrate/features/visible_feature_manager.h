@@ -71,6 +71,11 @@ public:
     return columns_;
   }
 
+  const LidarPointCollection& getOrigins() const
+  {
+    return origins_;
+  }
+
   /**
    * 현재 파란 공이 포획되어 있는지 확인합니다.
    */
@@ -169,6 +174,7 @@ private:
   BallCollection balls_;
   LidarPointCollection lidar_points_;
   LidarPointCollection columns_;
+  LidarPointCollection origins_;
   bool is_blue_ball_captured_ = false;
   ImuVectorT imu_angular_velocity_;     ///< (x축, y축, z축) (rad/s)
   ImuVectorT imu_linear_acceleration_;  ///< (x, y, z) (m/s^2)
