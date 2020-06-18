@@ -18,6 +18,11 @@ TaskResult LineTracer::doTick(Blackboard &blackboard)
 
   // midpoint의 상대적 위치를 -1 ~ 1 사이의 값으로 변환한다.
   double midpoint_relative = lt_box_midpoint / lt_image_width * 2 - 1;
+  // Fix for initial value
+  if (lt_box_midpoint == 0)
+  {
+    midpoint_relative = 0;
+  }
 
   // 속도 파라미터
   double speed_base;

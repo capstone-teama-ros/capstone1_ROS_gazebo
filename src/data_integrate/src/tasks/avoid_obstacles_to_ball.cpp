@@ -11,7 +11,7 @@
 double getFreeRadius(const Feature &obstacle)
 {
   // Robot size is approximately 30 cm x 30 cm, so we use a value slightly bigger than sqrt(2) * 0.15 m
-  const double ROBOT_FREE_RADIUS = 0.22;  // meters
+  const double ROBOT_FREE_RADIUS = 0.23;  // meters
   return obstacle.getCollisionRadius() + ROBOT_FREE_RADIUS;
 }
 

@@ -71,7 +71,7 @@
   </gazebo>
   
   <gazebo reference="imu_test">
-    <sensor type="imu" name="imu">
+    <sensor type="imu" name="imu_test">
       <always_on>true</always_on>
     </sensor>
     <material>Gazebo/Grey</material>
@@ -83,8 +83,8 @@
       <bodyName>imu_test</bodyName>
       <frameName>imu_test</frameName>
       <topicName>imu_test</topicName>
-      <serviceName>imu_service</serviceName>
-      <gaussianNoise>0.0</gaussianNoise>
+      <serviceName>imu_service_test</serviceName>
+      <gaussianNoise>0.1</gaussianNoise>
       <updateRate>200</updateRate>
       <imu>
         <noise>
