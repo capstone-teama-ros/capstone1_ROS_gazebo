@@ -67,6 +67,7 @@ add_library(${PROJECT_NAME}_tasks_lib
   src/tasks/move_distance.cpp
   src/tasks/periodic_search_move_once.cpp
   src/tasks/periodic_search_move_repeat.cpp
+  src/tasks/sequence_task.cpp
   src/tasks/task.cpp
   src/tasks/turn_angle.cpp
   src/tasks/turn_to_nearest_ball.cpp
