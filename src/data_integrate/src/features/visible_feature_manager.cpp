@@ -1,10 +1,22 @@
 #include "data_integrate/features/visible_feature_manager.h"
 
 #include <ros/ros.h>
+#include <algorithm>
 #include <cmath>
+#include <iterator>
 #include <limits>
+#include <tuple>
 #include <vector>
 
+VisibleFeatureManager::BallCollection VisibleFeatureManager::getBalls(BallColor color) const
+{
+  VisibleFeatureManager::BallCollection color_balls;
+  std::copy_if(balls_.begin(), balls_.end(), std::back_inserter(color_balls),
+               [=](const Ball& ball) { return ball.getColor() == color; });
+  return color_balls;
+}
+
+using ColumnList = VisibleFeatureManager::ColumnList;
 using RelPointList = std::vector<RelPoint>;
 using RelPointClusterList = std::vector<RelPointList>;
 
@@ -144,10 +156,10 @@ Rect findBoundingBox(const RelPointList& points)
  * @param max_points  한 기둥 내에 포함된 점의 최대 갯수. 이보다 점이 많으면 기둥이 아닌 벽으로 판단해 무시합니다.
  * @param max_cluster_size  클러스터의 최대 크기 (meters).
  * 클러스터의 bounding box의 너비나 높이가 이보다 크면 기둥이 아닌 벽으로 판단해 무시합니다.
- * @returns 검출한 기둥들의 좌표
+ * @returns Tuple of (list of columns found, list of points that do not belong in columns)
  */
-RelPointList findColumns(const RelPointList& points, double threshold, size_t min_points, size_t max_points,
-                         double max_cluster_size)
+std::tuple<ColumnList, RelPointList> findColumns(const RelPointList& points, double threshold, size_t min_points,
+                                                 size_t max_points, double max_cluster_size)
 {
   ROS_ASSERT(threshold >= 0);
   ROS_ASSERT(min_points <= max_points);
@@ -155,7 +167,8 @@ RelPointList findColumns(const RelPointList& points, double threshold, size_t mi
 
   auto clusters = clusterByNearestPointDistance(points, threshold);
 
-  RelPointList columns;
+  ColumnList columns;
+  RelPointList wall_points;
   for (auto& cluster : clusters)
   {
     auto bounding_box = findBoundingBox(cluster);
@@ -163,11 +176,19 @@ RelPointList findColumns(const RelPointList& points, double threshold, size_t mi
     if (min_points <= cluster.size() && cluster.size() <= max_points && bounding_box.width <= max_cluster_size &&
         bounding_box.height <= max_cluster_size)
     {
-      columns.emplace_back(computeAveragePoint(cluster));
+      auto avg_point = computeAveragePoint(cluster);
+      columns.emplace_back(static_cast<const Feature&>(avg_point));
+    }
+    else
+    {
+      for (auto&& point : cluster)
+      {
+        wall_points.emplace_back(point);
+      }
     }
   }
 
-  return columns;
+  return std::make_tuple(columns, wall_points);
 }
 
 void VisibleFeatureManager::subscribeToLidar(const sensor_msgs::LaserScan::ConstPtr& msg)
@@ -184,8 +205,7 @@ void VisibleFeatureManager::subscribeToLidar(const sensor_msgs::LaserScan::Const
     {
       // LIDAR는 x축을 기준으로 반시계 방향으로 각도를 측정합니다.
       // 저희는 y축을 기준으로 측정할 예정이니 90도를 빼야 합니다.
-      // 그런데 180도 뒤집힌 것을 보니 센서가 거꾸로 달려 있는 듯? 그래서 90도를 더하는 것으로 했습니다.
-      auto angle = msg->angle_min + msg->angle_increment * i + M_PI / 2;
+      auto angle = msg->angle_min + msg->angle_increment * i - M_PI / 2;
       lidar_points_.emplace_back(range, angle);
     }
 
@@ -198,7 +218,7 @@ void VisibleFeatureManager::subscribeToLidar(const sensor_msgs::LaserScan::Const
   const size_t COLUMN_MAX_POINTS = 20;  // 너무 작게 하면 가까운 기둥을 인식하지 못하므로, 적당히 큰 값으로 합니다.
   const double COLUMN_MAX_CLUSTER_SIZE = 0.2;  // meters
 
-  columns_ =
+  std::tie(columns_, wall_points_) =
       findColumns(lidar_points_, COLUMN_THRESHOLD, COLUMN_MIN_POINTS, COLUMN_MAX_POINTS, COLUMN_MAX_CLUSTER_SIZE);
 
   const size_t EXPECTED_COLUMN_COUNT = 4;
@@ -227,7 +247,10 @@ void VisibleFeatureManager::subscribeToCamera(const core_msgs::ball_position::Co
   {
     addBall(Ball::fromRelXY(BallColor::Green, ball.x, ball.z));
   }
+}
 
+void VisibleFeatureManager::subscribeToLowerCamera(const core_msgs::ball_ch::ConstPtr& msg)
+{
   is_blue_ball_captured_ = msg->still_blue;
 }
 

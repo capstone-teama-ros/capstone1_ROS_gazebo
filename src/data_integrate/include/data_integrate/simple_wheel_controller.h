@@ -54,6 +54,14 @@ public:
   }
 
   /**
+   * Moves with both linear and angular velocity components.
+   * Warning: Actual speed may be significantly different.
+   * @param linear_speed  m/s
+   * @param angular_speed rad/s
+   */
+  void moveComposite(double linear_speed, double angular_speed);
+
+  /**
    * 선운동 또는 회전을 중지하고 제자리에 정지합니다.
    * 이미 정지한 경우 아무런 동작을 하지 않습니다.
    */

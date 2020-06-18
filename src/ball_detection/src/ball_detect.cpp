@@ -22,8 +22,6 @@ const cv::Scalar HSV_THRESHOLD_BLUE_HIGH(121, 255, 255);
 const cv::Scalar HSV_THRESHOLD_GREEN_LOW(50, 126, 60);
 const cv::Scalar HSV_THRESHOLD_GREEN_HIGH(70, 255, 255);
 
-const int low_b_b = 150, high_g_b = 50, high_r_b = 50;
-
 struct BallDetectData
 {
   std::vector<cv::Vec4i> hierarchy;
@@ -227,25 +225,47 @@ void ball_detect(const cv::Mat& buffer)
     ROS_INFO("  x = %.4f, y = %.4f, z = %.4f", ball_pos.x, ball_pos.y, ball_pos.z);
   }
 
-  pub.publish(msg);  // publish a message
-  cv::imshow("result", result);
+  pub.publish(msg);      // publish a message
+  cv::Mat result_shown;  // actual matrix shown
+  cv::resize(result, result_shown, cv::Size(), 0.5, 0.5);
+  cv::imshow("result", result_shown);
 }
 
 void ball_check(const cv::Mat& buffer2)
 {
+  const int low_b_b = 60, high_g_b = 30, high_r_b = 30;
   core_msgs::ball_ch msg;
-  //  ROS_INFO("%s", buffer2.at<cv::Vec3b>(320,240)[0].c_str());          //확인해보려고 출력해보려했는데 오류떠서
-  //  지워놨습니다.
-  if (buffer2.at<cv::Vec3b>(320, 240)[0] > low_b_b && buffer2.at<cv::Vec3b>(320, 240)[1] < high_g_b &&
-      buffer2.at<cv::Vec3b>(320, 240)[2] < high_r_b)
-  {  //두번째 카메라에서 (320,240)의 b값이 최소값보다 큰지 확인한건데 원하는 위치에 맞게 조정 및 파란색만 잘 확인 될지
-    msg.still_blue = 1;
-  }
-  else
+
+  std::vector<cv::Vec3b> points;
+  int buf_width = buffer2.size().width;
+  int buf_height = buffer2.size().height;
+
+  // Check multiple points because the center does not always work
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height / 2, buf_width / 2));              // center
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height / 2, buf_width / 32));             // center left
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height / 2, buf_width * 15 / 16));        // center right
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height * 3 / 4, buf_width / 2));          // below center
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height * 3 / 4, buf_width / 32));         // below left
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height * 3 / 4, buf_width * 15 / 16));    // below right
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height * 15 / 16, buf_width / 2));        // bottom center
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height * 15 / 16, buf_width / 32));       // bottom left
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height * 15 / 16, buf_width * 15 / 16));  // bottom right
+
+  msg.still_blue = 0;
+  for (auto& point : points)
   {
-    msg.still_blue = 0;
+    ROS_DEBUG("%d, %d, %d", point[0], point[1], point[2]);
+    if (point[0] > low_b_b && point[1] < high_g_b && point[2] < high_r_b)
+    {
+      msg.still_blue = 1;
+      break;
+    }
   }
+
   pub1.publish(msg);  // publish a message
+  cv::Mat result_shown;
+  cv::resize(buffer2, result_shown, cv::Size(), 0.5, 0.5);
+  cv::imshow("lower cam", result_shown);
 }
 
 void imageCallback1(const sensor_msgs::ImageConstPtr& msg)

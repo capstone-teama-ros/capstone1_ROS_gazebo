@@ -1,6 +1,7 @@
 #ifndef DATA_INTEGRATE_FEATURES_VISIBLE_FEATURE_MANAGER_H
 #define DATA_INTEGRATE_FEATURES_VISIBLE_FEATURE_MANAGER_H
 
+#include <core_msgs/ball_ch.h>
 #include <core_msgs/ball_position.h>
 #include <core_msgs/line_info.h>
 #include <geometry_msgs/Vector3.h>
@@ -8,6 +9,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <vector>
 #include "./ball.h"
+#include "./column.h"
 #include "./rel_point.h"
 
 /**
@@ -24,6 +26,13 @@ public:
   void subscribeToCamera(const core_msgs::ball_position::ConstPtr& msg);
 
   /**
+   * Callback that receives data from the lower camera.
+   *
+   * @param msg topic으로부터 받는 데이터 메시지
+   */
+  void subscribeToLowerCamera(const core_msgs::ball_ch::ConstPtr& msg);
+
+  /**
    * LIDAR topic에 subscribe하여 데이터를 받기 위한 callback입니다.
    *
    * @param msg topic으로부터 받는 데이터 메시지
@@ -31,6 +40,7 @@ public:
   void subscribeToLidar(const sensor_msgs::LaserScan::ConstPtr& msg);
 
   using BallCollection = std::vector<Ball>;
+  using ColumnList = std::vector<Column>;
   using LidarPointCollection = std::vector<RelPoint>;
 
   /**
@@ -56,6 +66,11 @@ public:
   }
 
   /**
+   * 가장 최근에 카메라로 관측한 공 중에서 특정한 색깔의 공들만 가져옵니다.
+   */
+  BallCollection getBalls(BallColor color) const;
+
+  /**
    * 가장 최근에 LIDAR로 관측한 점의 목록을 가져옵니다.
    */
   const LidarPointCollection& getLidarPoints() const
@@ -66,9 +81,17 @@ public:
   /**
    * 가장 최근에 LIDAR로 관측한 기둥의 목록을 가져옵니다.
    */
-  const LidarPointCollection& getColumns() const
+  const ColumnList& getColumns() const
   {
     return columns_;
+  }
+
+  /**
+   * @returns List of points that form walls, but not columns.
+   */
+  const LidarPointCollection& getWallPoints() const
+  {
+    return wall_points_;
   }
 
   /**
@@ -168,7 +191,8 @@ public:
 private:
   BallCollection balls_;
   LidarPointCollection lidar_points_;
-  LidarPointCollection columns_;
+  ColumnList columns_;
+  LidarPointCollection wall_points_;
   bool is_blue_ball_captured_ = false;
   ImuVectorT imu_angular_velocity_;     ///< (x축, y축, z축) (rad/s)
   ImuVectorT imu_linear_acceleration_;  ///< (x, y, z) (m/s^2)
