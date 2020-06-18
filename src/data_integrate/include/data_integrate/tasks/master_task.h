@@ -12,8 +12,6 @@
 class MasterTask : public Task
 {
 public:
-  MasterTask();
-
   const char *name() const override
   {
     return "MasterTask";
