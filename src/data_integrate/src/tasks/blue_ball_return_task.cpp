@@ -1,11 +1,13 @@
 #include "data_integrate/tasks/blue_ball_return_task.h"
 
 #include <ros/ros.h>
+#include "data_integrate/tasks/kick_ball_into_goal.h"
 #include "data_integrate/tasks/move_ball_to_goal_area.h"
 
 BlueBallReturnTask::BlueBallReturnTask()
 {
   subtasks_.push_back(TaskPtr(new MoveBallToGoalArea()));
+  subtasks_.push_back(TaskPtr(new KickBallIntoGoal()));
 
   current_subtask_ = subtasks_.begin();
 }
