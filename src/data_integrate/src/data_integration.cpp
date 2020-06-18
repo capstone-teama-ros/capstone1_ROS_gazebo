@@ -44,7 +44,6 @@ int main(int argc, char** argv)
   DirectWheelController direct_controller(fl_wheel, fr_wheel, bl_wheel, br_wheel);
   Blackboard blackboard(visible_features, wheel_controller, direct_controller);
   TaskExecutor task_executor(blackboard);
-  task_executor.overrideTask(Task::TaskPtr(new BallHarvester()));
 
   ros::Duration sleep_duration(0.025);
 

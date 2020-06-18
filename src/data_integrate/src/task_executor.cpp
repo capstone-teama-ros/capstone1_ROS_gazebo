@@ -2,6 +2,11 @@
 
 #include <ros/ros.h>
 #include <utility>
+#include "data_integrate/tasks/master_task.h"
+
+TaskExecutor::TaskExecutor(Blackboard &blackboard) : blackboard_(blackboard), task_(Task::TaskPtr(new MasterTask()))
+{
+}
 
 void TaskExecutor::runTaskInLoop(double time_passed_after_last, double time_until_next)
 {
