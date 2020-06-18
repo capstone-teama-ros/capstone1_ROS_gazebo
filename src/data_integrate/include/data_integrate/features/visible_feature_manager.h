@@ -87,6 +87,14 @@ public:
   }
 
   /**
+   * @returns List of points that form walls, but not columns.
+   */
+  const LidarPointCollection& getWallPoints() const
+  {
+    return wall_points_;
+  }
+
+  /**
    * 현재 파란 공이 포획되어 있는지 확인합니다.
    */
   bool isBlueBallCaptured() const
@@ -184,6 +192,7 @@ private:
   BallCollection balls_;
   LidarPointCollection lidar_points_;
   ColumnList columns_;
+  LidarPointCollection wall_points_;
   bool is_blue_ball_captured_ = false;
   ImuVectorT imu_angular_velocity_;     ///< (x축, y축, z축) (rad/s)
   ImuVectorT imu_linear_acceleration_;  ///< (x, y, z) (m/s^2)

@@ -5,6 +5,7 @@
 #include <cmath>
 #include <iterator>
 #include <limits>
+#include <tuple>
 #include <vector>
 
 VisibleFeatureManager::BallCollection VisibleFeatureManager::getBalls(BallColor color) const
@@ -155,10 +156,10 @@ Rect findBoundingBox(const RelPointList& points)
  * @param max_points  한 기둥 내에 포함된 점의 최대 갯수. 이보다 점이 많으면 기둥이 아닌 벽으로 판단해 무시합니다.
  * @param max_cluster_size  클러스터의 최대 크기 (meters).
  * 클러스터의 bounding box의 너비나 높이가 이보다 크면 기둥이 아닌 벽으로 판단해 무시합니다.
- * @returns 검출한 기둥들의 좌표
+ * @returns Tuple of (list of columns found, list of points that do not belong in columns)
  */
-ColumnList findColumns(const RelPointList& points, double threshold, size_t min_points, size_t max_points,
-                       double max_cluster_size)
+std::tuple<ColumnList, RelPointList> findColumns(const RelPointList& points, double threshold, size_t min_points,
+                                                 size_t max_points, double max_cluster_size)
 {
   ROS_ASSERT(threshold >= 0);
   ROS_ASSERT(min_points <= max_points);
@@ -167,6 +168,7 @@ ColumnList findColumns(const RelPointList& points, double threshold, size_t min_
   auto clusters = clusterByNearestPointDistance(points, threshold);
 
   ColumnList columns;
+  RelPointList wall_points;
   for (auto& cluster : clusters)
   {
     auto bounding_box = findBoundingBox(cluster);
@@ -177,9 +179,16 @@ ColumnList findColumns(const RelPointList& points, double threshold, size_t min_
       auto avg_point = computeAveragePoint(cluster);
       columns.emplace_back(static_cast<const Feature&>(avg_point));
     }
+    else
+    {
+      for (auto&& point : cluster)
+      {
+        wall_points.emplace_back(point);
+      }
+    }
   }
 
-  return columns;
+  return std::make_tuple(columns, wall_points);
 }
 
 void VisibleFeatureManager::subscribeToLidar(const sensor_msgs::LaserScan::ConstPtr& msg)
@@ -209,7 +218,7 @@ void VisibleFeatureManager::subscribeToLidar(const sensor_msgs::LaserScan::Const
   const size_t COLUMN_MAX_POINTS = 20;  // 너무 작게 하면 가까운 기둥을 인식하지 못하므로, 적당히 큰 값으로 합니다.
   const double COLUMN_MAX_CLUSTER_SIZE = 0.2;  // meters
 
-  columns_ =
+  std::tie(columns_, wall_points_) =
       findColumns(lidar_points_, COLUMN_THRESHOLD, COLUMN_MIN_POINTS, COLUMN_MAX_POINTS, COLUMN_MAX_CLUSTER_SIZE);
 
   const size_t EXPECTED_COLUMN_COUNT = 4;
