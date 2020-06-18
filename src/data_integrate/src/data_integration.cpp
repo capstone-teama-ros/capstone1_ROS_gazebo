@@ -10,7 +10,7 @@
 #include "data_integrate/features/visible_feature_manager.h"
 #include "data_integrate/simple_wheel_controller.h"
 #include "data_integrate/task_executor.h"
-#include "data_integrate/tasks/blue_ball_return_task.h"
+#include "data_integrate/tasks/ball_harvester.h"
 
 int main(int argc, char** argv)
 {
@@ -44,7 +44,7 @@ int main(int argc, char** argv)
   DirectWheelController direct_controller(fl_wheel, fr_wheel, bl_wheel, br_wheel);
   Blackboard blackboard(visible_features, wheel_controller, direct_controller);
   TaskExecutor task_executor(blackboard);
-  task_executor.overrideTask(Task::TaskPtr(new BlueBallReturnTask()));
+  task_executor.overrideTask(Task::TaskPtr(new BallHarvester()));
 
   ros::Duration sleep_duration(0.025);
 

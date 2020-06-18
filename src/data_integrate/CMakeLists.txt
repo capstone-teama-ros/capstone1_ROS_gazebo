@@ -56,6 +56,7 @@ add_dependencies(${PROJECT_NAME}_features_lib
 add_library(${PROJECT_NAME}_tasks_lib
   src/tasks/approach_blue_ball.cpp
   src/tasks/avoid_obstacles_to_ball.cpp
+  src/tasks/ball_harvester.cpp
   src/tasks/blue_ball_capture_task.cpp
   src/tasks/blue_ball_return_task.cpp
   src/tasks/blue_ball_search_task.cpp
