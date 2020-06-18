@@ -9,6 +9,8 @@
 class BlueBallReturnTask : public Task
 {
 public:
+  BlueBallReturnTask();
+
   const char *name() const override
   {
     return "BlueBallReturnTask";
@@ -23,8 +25,10 @@ private:
    * @returns 작업을 실행한 결과
    */
   TaskResult doTick(Blackboard &blackboard) override;
-
   void doHalt(Blackboard &blackboard) override;
+
+  TaskList subtasks_;
+  TaskListIter current_subtask_;
 };
 
 #endif  // DATA_INTEGRATE_TASKS_BLUE_BALL_RETURN_TASK_H
