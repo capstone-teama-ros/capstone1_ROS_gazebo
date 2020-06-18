@@ -128,6 +128,13 @@ TaskResult AvoidObstaclesToBall::doTick(Blackboard &blackboard)
       obstacles.emplace_back(FeaturePtr(new Column(column)));
     }
   }
+  for (auto &wall_point : blackboard.visible_features_.getWallPoints())
+  {
+    if (computeFreeDistanceToAlignedPath(wall_point, *nearest_ball) < 0)
+    {
+      obstacles.emplace_back(FeaturePtr(new Column(wall_point)));
+    }
+  }
 
   auto nearest_obstacle =
       std::min_element(obstacles.begin(), obstacles.end(), [](const FeaturePtr &a, const FeaturePtr &b) {
