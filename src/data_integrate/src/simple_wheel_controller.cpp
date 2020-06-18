@@ -25,6 +25,12 @@ void SimpleWheelController::turn(double angular_speed)
   angular_speed_ = angular_speed;
 }
 
+void SimpleWheelController::moveComposite(double linear_speed, double angular_speed)
+{
+  linear_speed_ = linear_speed;
+  angular_speed_ = angular_speed;
+}
+
 void SimpleWheelController::stop()
 {
   linear_speed_ = 0;
