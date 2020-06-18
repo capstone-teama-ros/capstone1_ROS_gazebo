@@ -242,7 +242,11 @@ void ball_check(const cv::Mat& buffer2)
 
   // Check multiple points because the center does not always work
   points.push_back(buffer2.at<cv::Vec3b>(buf_height / 2, buf_width / 2));              // center
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height / 2, buf_width / 32));             // center left
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height / 2, buf_width * 15 / 16));        // center right
   points.push_back(buffer2.at<cv::Vec3b>(buf_height * 3 / 4, buf_width / 2));          // below center
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height * 3 / 4, buf_width / 32));         // below left
+  points.push_back(buffer2.at<cv::Vec3b>(buf_height * 3 / 4, buf_width * 15 / 16));    // below right
   points.push_back(buffer2.at<cv::Vec3b>(buf_height * 15 / 16, buf_width / 2));        // bottom center
   points.push_back(buffer2.at<cv::Vec3b>(buf_height * 15 / 16, buf_width / 32));       // bottom left
   points.push_back(buffer2.at<cv::Vec3b>(buf_height * 15 / 16, buf_width * 15 / 16));  // bottom right
