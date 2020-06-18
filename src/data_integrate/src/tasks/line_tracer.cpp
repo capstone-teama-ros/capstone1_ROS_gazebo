@@ -22,9 +22,9 @@ TaskResult LineTracer::doTick(Blackboard &blackboard)
   // 속도 파라미터
   double speed_base;
   double speed_turn_factor;
-  ros::param::param<double>("~speed_base", speed_base, 0);
+  ros::param::param<double>("~speed_base", speed_base, 0.6);
   ROS_INFO_ONCE("Reading parameter from: %s", ros::names::resolve("~speed_base").c_str());
-  ros::param::param<double>("~speed_turn_factor", speed_turn_factor, 0);
+  ros::param::param<double>("~speed_turn_factor", speed_turn_factor, 0.6);
   ROS_INFO_ONCE("Reading parameter from: %s", ros::names::resolve("~speed_turn_factor").c_str());
   speed_base /= 0.063;
   speed_turn_factor /= 0.063;
