@@ -45,8 +45,6 @@ int main(int argc, char** argv)
   Blackboard blackboard(visible_features, wheel_controller, direct_controller);
   TaskExecutor task_executor(blackboard);
 
-  task_executor.overrideTask(Task::TaskPtr(new LineTracer()));
-
   ros::Duration sleep_duration(0.025);
 
   while (ros::ok())
