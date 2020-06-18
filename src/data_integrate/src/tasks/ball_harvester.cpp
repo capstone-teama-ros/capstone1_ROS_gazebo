@@ -1,18 +1,21 @@
+#include "data_integrate/tasks/ball_harvester.h"
+
+#include "data_integrate/tasks/blue_ball_capture_task.h"
 #include "data_integrate/tasks/blue_ball_return_task.h"
+#include "data_integrate/tasks/blue_ball_search_task.h"
+#include "data_integrate/tasks/goal_post_search_task.h"
 
-#include <ros/ros.h>
-#include "data_integrate/tasks/kick_ball_into_goal.h"
-#include "data_integrate/tasks/move_ball_to_goal_area.h"
-
-BlueBallReturnTask::BlueBallReturnTask()
+BallHarvester::BallHarvester()
 {
-  subtasks_.push_back(TaskPtr(new MoveBallToGoalArea()));
-  subtasks_.push_back(TaskPtr(new KickBallIntoGoal()));
+  subtasks_.push_back(TaskPtr(new BlueBallSearchTask()));
+  subtasks_.push_back(TaskPtr(new BlueBallCaptureTask()));
+  subtasks_.push_back(TaskPtr(new GoalPostSearchTask()));
+  subtasks_.push_back(TaskPtr(new BlueBallReturnTask()));
 
   current_subtask_ = subtasks_.begin();
 }
 
-TaskResult BlueBallReturnTask::doTick(Blackboard &blackboard)
+TaskResult BallHarvester::doTick(Blackboard &blackboard)
 {
   // 모두 성공할 때까지 순차적으로 실행
   while (current_subtask_ != subtasks_.end())
@@ -41,7 +44,7 @@ TaskResult BlueBallReturnTask::doTick(Blackboard &blackboard)
   return TaskResult::Success;
 }
 
-void BlueBallReturnTask::doHalt(Blackboard &blackboard)
+void BallHarvester::doHalt(Blackboard &blackboard)
 {
   for (auto &subtask : subtasks_)
   {

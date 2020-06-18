@@ -1,19 +1,20 @@
-#ifndef DATA_INTEGRATE_TASKS_BLUE_BALL_RETURN_TASK_H
-#define DATA_INTEGRATE_TASKS_BLUE_BALL_RETURN_TASK_H
+#ifndef DATA_INTEGRATE_TASKS_MASTER_TASK_H
+#define DATA_INTEGRATE_TASKS_MASTER_TASK_H
 
 #include "./task.h"
 
+#include "./ball_harvester.h"
+#include "./line_tracer.h"
+
 /**
- * 발견한 골대까지 이동해 파란 공을 넣는 작업입니다.
+ * Master task for the robot
  */
-class BlueBallReturnTask : public Task
+class MasterTask : public Task
 {
 public:
-  BlueBallReturnTask();
-
   const char *name() const override
   {
-    return "BlueBallReturnTask";
+    return "MasterTask";
   }
 
 private:
@@ -25,10 +26,12 @@ private:
    * @returns 작업을 실행한 결과
    */
   TaskResult doTick(Blackboard &blackboard) override;
+
   void doHalt(Blackboard &blackboard) override;
 
-  TaskList subtasks_;
-  TaskListIter current_subtask_;
+  LineTracer line_tracer_task_;
+  BallHarvester ball_harvester_task_;
+  bool is_line_tracer_ = true;
 };
 
-#endif  // DATA_INTEGRATE_TASKS_BLUE_BALL_RETURN_TASK_H
+#endif  // DATA_INTEGRATE_TASKS_MASTER_TASK_H

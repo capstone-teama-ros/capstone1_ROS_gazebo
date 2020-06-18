@@ -70,6 +70,42 @@
     </plugin>
   </gazebo>
   
+  <gazebo reference="imu_test">
+    <sensor type="imu" name="imu">
+      <always_on>true</always_on>
+    </sensor>
+    <material>Gazebo/Grey</material>
+  </gazebo>
+  
+   <gazebo>
+    <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
+      <alwaysOn>true</alwaysOn>
+      <bodyName>imu_test</bodyName>
+      <frameName>imu_test</frameName>
+      <topicName>imu_test</topicName>
+      <serviceName>imu_service</serviceName>
+      <gaussianNoise>0.0</gaussianNoise>
+      <updateRate>200</updateRate>
+      <imu>
+        <noise>
+          <type>gaussian</type>
+          <rate>
+            <mean>0.0</mean>
+            <stddev>2e-4</stddev>
+            <bias_mean>0.0000075</bias_mean>
+            <bias_stddev>0.0000008</bias_stddev>
+          </rate>
+          <accel>
+            <mean>0.0</mean>
+            <stddev>1.7e-2</stddev>
+            <bias_mean>0.1</bias_mean>
+            <bias_stddev>0.001</bias_stddev>
+          </accel>
+        </noise>
+      </imu>
+    </plugin>
+  </gazebo>
+  
   <!--DEPTH Camera-x import-->
   <gazebo reference="camera_rgb_frame">
     <sensor type="depth" name="realsense_R200">

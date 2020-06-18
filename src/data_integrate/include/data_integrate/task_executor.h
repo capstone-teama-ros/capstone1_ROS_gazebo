@@ -15,9 +15,7 @@ public:
   /**
    * @param blackboard 모든 작업이 함께 사용할 Blackboard
    */
-  TaskExecutor(Blackboard &blackboard) : blackboard_(blackboard)
-  {
-  }
+  TaskExecutor(Blackboard &blackboard);
 
   /**
    * 현재 실행 중인 작업의 상태를 업데이트하고, 작업의 결정에 따라 바퀴 컨트롤러에 메시지를 전파합니다.

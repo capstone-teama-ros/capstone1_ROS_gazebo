@@ -10,6 +10,7 @@ const double TurnAngle::THRESHOLD = angles::from_degrees(0.5);
 
 void TurnAngle::doHalt(Blackboard &blackboard)
 {
+  blackboard.wheel_controller_.stop();
   amount_turned_ = 0;
   is_first_tick_ = true;
 }
@@ -44,6 +45,6 @@ TaskResult TurnAngle::doTick(Blackboard &blackboard)
   {
     turn_speed = -turn_speed;
   }
-  blackboard.wheel_controller_.turn(turn_speed);
+  blackboard.wheel_controller_.moveComposite(linear_speed_, turn_speed);
   return TaskResult::Running;
 }

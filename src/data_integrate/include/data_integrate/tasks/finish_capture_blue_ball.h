@@ -1,19 +1,18 @@
-#ifndef DATA_INTEGRATE_TASKS_BLUE_BALL_RETURN_TASK_H
-#define DATA_INTEGRATE_TASKS_BLUE_BALL_RETURN_TASK_H
+#ifndef DATA_INTEGRATE_TASKS_FINISH_CAPTURE_BLUE_BALL_H
+#define DATA_INTEGRATE_TASKS_FINISH_CAPTURE_BLUE_BALL_H
 
 #include "./task.h"
 
 /**
- * 발견한 골대까지 이동해 파란 공을 넣는 작업입니다.
+ * Moves blindly in a straight line for a little bit, hoping to capture the blue ball in front of the robot.
+ * If the blue ball is not captured after a while, aborts.
  */
-class BlueBallReturnTask : public Task
+class FinishCaptureBlueBall : public Task
 {
 public:
-  BlueBallReturnTask();
-
   const char *name() const override
   {
-    return "BlueBallReturnTask";
+    return "FinishCaptureBlueBall";
   }
 
 private:
@@ -25,10 +24,10 @@ private:
    * @returns 작업을 실행한 결과
    */
   TaskResult doTick(Blackboard &blackboard) override;
+
   void doHalt(Blackboard &blackboard) override;
 
-  TaskList subtasks_;
-  TaskListIter current_subtask_;
+  double move_timer_ = 0;
 };
 
-#endif  // DATA_INTEGRATE_TASKS_BLUE_BALL_RETURN_TASK_H
+#endif  // DATA_INTEGRATE_TASKS_FINISH_CAPTURE_BLUE_BALL_H

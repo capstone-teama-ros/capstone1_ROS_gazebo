@@ -24,41 +24,31 @@ catkin_make
 ### 2. running the code
 
 map open
+
 ```
 roslaunch map_generate import_world.launch
 ```
-swapn the robot
+
+Spawn the robot
+
 ```
 roslaunch p31 myrobot.launch
 ```
+
 launch the controller_manager
+
 ```
 roslaunch p31_control control.launch
 ```
-steer the robot
-```
-rosrun turtlebot3_teleop turtlebot3_teleop_key
-```
 
-```
-->              q     w     e
-                a     s     d
-                      x
-```
-```
-w: linear velocity increase
-a: angular velocity increase to clockwise
-s: stop
-d: angular velocity increase to counter-clockwise
-x: linear velocity decrease
-```
-detect and publish ball position from camera image
+detect and publish ball position & line detector info from camera image
+
 ```
 rosrun ball_detection ball_detect_node
-```
-~~draw the lidar data and ball position~~
-```
-rosrun data_integrate data_show_node
+rosrun ball_detection line_detect_node
 ```
 
-
+start the AI
+```
+rosrun data_integrate data_integration_node
+```

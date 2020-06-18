@@ -25,6 +25,12 @@ void SimpleWheelController::turn(double angular_speed)
   angular_speed_ = angular_speed;
 }
 
+void SimpleWheelController::moveComposite(double linear_speed, double angular_speed)
+{
+  linear_speed_ = linear_speed;
+  angular_speed_ = angular_speed;
+}
+
 void SimpleWheelController::stop()
 {
   linear_speed_ = 0;
@@ -37,7 +43,7 @@ void SimpleWheelController::publish() const
   std_msgs::Float64 right_wheel_msg;
 
   /// 실험적으로 구한 비례상수
-  const double LINEAR_SPEED_FACTOR = 1 / 0.054;
+  const double LINEAR_SPEED_FACTOR = 1 / 0.067;
   auto wheel_angular_speed = convertRobotAngularVelocityToWheelVelocity(angular_speed_);
 
   left_wheel_msg.data = LINEAR_SPEED_FACTOR * linear_speed_ - wheel_angular_speed;
@@ -62,12 +68,8 @@ using InterPoint = std::pair<double, double>;
  */
 const InterPoint ROBOT_TO_WHEEL_ANGULAR[] = {
   { 0, 0 },
-  { 0.31573, 1.30900 },
-  { 0.80468, 2.61799 },
-  { 1.29654, 3.92699 },
-  { 1.80750, 5.23599 },
-  { 2.31900, 6.54499 },
-  { 2.57867, 7.85398 },
+  { 2 * M_PI / 5.045, 5 },
+  { 2 * M_PI / 2.28, 10 },
 };
 
 double SimpleWheelController::convertRobotAngularVelocityToWheelVelocity(double robot_angular_velocity)

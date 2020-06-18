@@ -18,6 +18,8 @@ int main(int argc, char** argv)
       n.subscribe<sensor_msgs::LaserScan>("/scan", 1000, &VisibleFeatureManager::subscribeToLidar, &vfm);
   ros::Subscriber camera_sub =
       n.subscribe<core_msgs::ball_position>("/position", 1000, &VisibleFeatureManager::subscribeToCamera, &vfm);
+  ros::Subscriber lower_cam_sub =
+      n.subscribe<core_msgs::ball_ch>("/ball_ch", 1000, &VisibleFeatureManager::subscribeToLowerCamera, &vfm);
 
   RobotDrawing image(600, 600, 1 / 0.015);
   const double LIDAR_POINT_SIZE = image.toMeters(2);

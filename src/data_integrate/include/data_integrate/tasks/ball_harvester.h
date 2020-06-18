@@ -1,19 +1,19 @@
-#ifndef DATA_INTEGRATE_TASKS_BLUE_BALL_RETURN_TASK_H
-#define DATA_INTEGRATE_TASKS_BLUE_BALL_RETURN_TASK_H
+#ifndef DATA_INTEGRATE_TASKS_BALL_HARVESTER_H
+#define DATA_INTEGRATE_TASKS_BALL_HARVESTER_H
 
 #include "./task.h"
 
 /**
- * 발견한 골대까지 이동해 파란 공을 넣는 작업입니다.
+ * Master task for the Ball Harvester mode
  */
-class BlueBallReturnTask : public Task
+class BallHarvester : public Task
 {
 public:
-  BlueBallReturnTask();
+  BallHarvester();
 
   const char *name() const override
   {
-    return "BlueBallReturnTask";
+    return "BallHarvester";
   }
 
 private:
@@ -25,10 +25,11 @@ private:
    * @returns 작업을 실행한 결과
    */
   TaskResult doTick(Blackboard &blackboard) override;
+
   void doHalt(Blackboard &blackboard) override;
 
   TaskList subtasks_;
   TaskListIter current_subtask_;
 };
 
-#endif  // DATA_INTEGRATE_TASKS_BLUE_BALL_RETURN_TASK_H
+#endif  // DATA_INTEGRATE_TASKS_BALL_HARVESTER_H
