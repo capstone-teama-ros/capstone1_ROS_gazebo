@@ -45,6 +45,6 @@ TaskResult TurnAngle::doTick(Blackboard &blackboard)
   {
     turn_speed = -turn_speed;
   }
-  blackboard.wheel_controller_.turn(turn_speed);
+  blackboard.wheel_controller_.moveComposite(linear_speed_, turn_speed);
   return TaskResult::Running;
 }

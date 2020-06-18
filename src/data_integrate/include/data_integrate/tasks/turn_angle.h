@@ -3,6 +3,9 @@
 
 #include "./task.h"
 
+/**
+ * Rotates the robot for a given amount of angle, optionally with a small, constant linear velocity component.
+ */
 class TurnAngle : public Task
 {
 public:
@@ -17,14 +20,19 @@ public:
   static const double THRESHOLD;
 
   /**
-   * @param angle 회전할 각도 (radians)
-   * @param max_turn_speed 최대 회전 속도 (rad/s). 0 이상의 값이어야 합니다. 기본값은 MAX_TURN_SPEED입니다.
+   * @param angle           Amount of angle to turn (radians)
+   * @param max_turn_speed  Maximum turn speed. Must be 0 or greater. (rad/s)
+   * @param linear_speed   Linear velocity amount (m/s)
    */
-  TurnAngle(double angle, double max_turn_speed = MAX_TURN_SPEED) : angle_(angle), max_turn_speed_(max_turn_speed){};
+  TurnAngle(double angle, double max_turn_speed = MAX_TURN_SPEED, double linear_speed = 0)
+    : angle_(angle), max_turn_speed_(max_turn_speed), linear_speed_(linear_speed)
+  {
+  }
 
 private:
   double angle_;
   double max_turn_speed_;
+  double linear_speed_;
   double amount_turned_ = 0;
   bool is_first_tick_ = true;
 
